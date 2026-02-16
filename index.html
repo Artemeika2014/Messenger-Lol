@@ -590,7 +590,77 @@
 
       <div id="msgList" class="msgs"></div>
 
-      <div class="composer">
+      /* ЧАТ — список сообщений */
+.msgs{
+  flex:1;
+  overflow:auto;
+  padding: 14px 12px 90px; /* место под нижнюю панель */
+}
+
+/* НИЖНЯЯ ПАНЕЛЬ ВВОДА */
+.composer{
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 10px;
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+  background: rgba(10,14,22,.95);
+  border-top: 1px solid rgba(255,255,255,.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  display:flex;
+  gap:8px;
+  align-items:center;
+  z-index: 999;
+}
+
+/* поле ввода */
+.composerInput{
+  flex:1;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background: rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius: 18px;
+  padding: 10px 12px;
+}
+
+.composerInput input{
+  flex:1;
+  border:none;
+  outline:none;
+  background:transparent;
+  color:white;
+  font-size:16px;
+  font-weight:700;
+}
+
+/* кнопка отправки */
+.sendBtn{
+  width:46px;
+  height:46px;
+  border-radius: 16px;
+  border:none;
+  background: linear-gradient(180deg,#2b86ff,#1f6bff);
+  color:white;
+  font-size:18px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+/* кнопка вложений */
+.toolBtn{
+  width:40px;
+  height:40px;
+  border-radius: 16px;
+  border:1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.06);
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+}
         <div class="toolBtn">📎</div>
         <div class="composerInput">
           <input id="msgInput" placeholder="Сообщение" />
