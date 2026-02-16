@@ -3,12 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>LOL</title>
+  <title>LOL Messenger</title>
 
   <style>
     :root{
       --bg:#070a10;
       --panel:rgba(18,24,38,.72);
+      --panel2:rgba(10,14,22,.88);
       --line:rgba(255,255,255,.08);
       --text:#eaf1ff;
       --muted:rgba(234,241,255,.62);
@@ -17,7 +18,9 @@
       --blue2:#1f6bff;
       --ok:#22c55e;
       --shadow:0 18px 45px rgba(0,0,0,.45);
-      --r:18px;
+
+      --tabbar-h:72px;          /* высота таббара */
+      --composer-h:72px;        /* визуальная высота композера (для отступов) */
     }
 
     *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -35,7 +38,7 @@
     }
 
     .app{ height:100%; display:flex; flex-direction:column; }
-    .screen{ flex:1; display:none; overflow:hidden; }
+    .screen{ display:none; height:100%; overflow:hidden; }
     .screen.active{ display:block; }
 
     .glass{
@@ -46,12 +49,37 @@
       box-shadow: var(--shadow);
     }
 
+    .topbar{
+      padding:14px 16px 10px;
+      padding-top:max(14px, env(safe-area-inset-top));
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .topbar h1{
+      margin:0;
+      font-size:28px;
+      font-weight:1000;
+      letter-spacing:.2px;
+    }
+
+    .iconbtn{
+      width:40px; height:40px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      display:grid; place-items:center;
+      cursor:pointer;
+    }
+
     .btn{
       width:100%;
       padding:12px 14px;
       border:none;
       border-radius:16px;
-      font-weight:900;
+      font-weight:1000;
       color:white;
       background: linear-gradient(180deg, var(--blue), var(--blue2));
       cursor:pointer;
@@ -84,12 +112,12 @@
       background:transparent;
       color:var(--text);
       font-size:16px;
-      font-weight:900;
+      font-weight:1000;
     }
 
-    .hint{ color:var(--muted); font-weight:800; font-size:13px; }
-    .err{ color:#fecaca; background: rgba(239,68,68,.14); border: 1px solid rgba(239,68,68,.25); padding:10px 12px; border-radius:16px; font-weight:900; }
-    .ok{ color:#bbf7d0; background: rgba(34,197,94,.12); border: 1px solid rgba(34,197,94,.22); padding:10px 12px; border-radius:16px; font-weight:900; }
+    .hint{ color:var(--muted); font-weight:900; font-size:13px; }
+    .err{ color:#fecaca; background: rgba(239,68,68,.14); border: 1px solid rgba(239,68,68,.25); padding:10px 12px; border-radius:16px; font-weight:1000; }
+    .ok{  color:#bbf7d0; background: rgba(34,197,94,.12); border: 1px solid rgba(34,197,94,.22); padding:10px 12px; border-radius:16px; font-weight:1000; }
     .hidden{ display:none !important; }
 
     /* ---------- AUTH ---------- */
@@ -101,7 +129,7 @@
     }
     .brand{
       font-size:34px;
-      font-weight:1000;
+      font-weight:1100;
       letter-spacing:.2px;
       margin: 8px 6px 2px;
       background: linear-gradient(90deg, #60a5fa, #a78bfa, #22c55e);
@@ -111,7 +139,7 @@
     .subtitle{
       margin: 0 6px 16px;
       color: var(--muted);
-      font-weight:900;
+      font-weight:1000;
     }
     .authCard{
       border-radius: 22px;
@@ -127,7 +155,7 @@
       border:none;
       border-radius: 16px;
       padding: 10px 12px;
-      font-weight:1000;
+      font-weight:1100;
       cursor:pointer;
       background: rgba(255,255,255,.06);
       border:1px solid var(--line);
@@ -146,53 +174,34 @@
       margin-bottom:10px;
     }
     .avatar{
-      width:72px; height:72px;
+      width:54px; height:54px;
       border-radius:50%;
       object-fit:cover;
       background: rgba(255,255,255,.08);
       border:1px solid var(--line);
       flex:0 0 auto;
     }
+    .avatar.big{ width:78px; height:78px; }
+    .avatar.med{ width:72px; height:72px; }
 
-    /* ---------- TOPBARS ---------- */
-    .topbar{
-      padding: 14px 16px 10px;
-      padding-top: max(14px, env(safe-area-inset-top));
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-    }
-    .topbar h1{
-      margin:0;
-      font-size:28px;
-      font-weight:1000;
-      letter-spacing:.2px;
-    }
-    .iconbtn{
-      width:40px; height:40px;
-      border-radius: 16px;
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.06);
-      color:var(--text);
-      display:grid; place-items:center;
-      cursor:pointer;
-    }
-
-    /* ---------- BOTTOM TABS ---------- */
+    /* ---------- TABBAR ---------- */
     .nav{
-      position:fixed; left:0; right:0; bottom:0;
+      position:fixed;
+      left:0; right:0; bottom:0;
+      height: var(--tabbar-h);
       padding-bottom: max(10px, env(safe-area-inset-bottom));
-      background: rgba(10,14,22,.88);
+      background: var(--panel2);
       border-top: 1px solid var(--line);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       z-index: 1000;
     }
     .navWrap{
+      height: calc(var(--tabbar-h) - max(10px, env(safe-area-inset-bottom)));
       display:flex;
-      padding: 10px 10px 8px;
+      padding: 10px 10px 0;
       justify-content:space-around;
+      align-items:flex-start;
     }
     .navItem{
       width:50%;
@@ -202,13 +211,14 @@
       gap:6px;
       cursor:pointer;
       color: var(--muted2);
-      font-weight:1000;
+      font-weight:1100;
       font-size:12px;
+      user-select:none;
     }
     .navItem.active{ color: var(--blue); }
     .navIcon{ width:26px; height:26px; display:grid; place-items:center; }
 
-    /* ---------- CHATS ---------- */
+    /* ---------- CHATS LIST ---------- */
     #scr-chats{ overflow:hidden; }
     .searchpill{
       margin: 0 16px 10px;
@@ -218,7 +228,7 @@
       padding: 12px 12px;
       display:flex; align-items:center; gap:10px;
       cursor:pointer;
-      font-weight:900;
+      font-weight:1000;
       color: var(--muted);
     }
     .banner{
@@ -226,7 +236,7 @@
       border-radius: 18px;
       padding: 16px 14px;
       background: linear-gradient(135deg, #7c3aed 0%, #2563eb 55%, #0ea5e9 100%);
-      box-shadow:var(--shadow);
+      box-shadow: var(--shadow);
       position:relative;
       overflow:hidden;
     }
@@ -237,15 +247,15 @@
       border-radius:50%;
       background: rgba(255,255,255,.18);
     }
-    .bannerTitle{ margin:0; font-weight:1000; font-size:18px; }
-    .bannerText{ margin:6px 0 0; font-weight:900; opacity:.9; }
+    .bannerTitle{ margin:0; font-weight:1100; font-size:18px; }
+    .bannerText{ margin:6px 0 0; font-weight:1000; opacity:.9; }
 
     .list{
-      padding: 0 10px 92px;
+      padding: 0 10px calc(var(--tabbar-h) + 16px + env(safe-area-inset-bottom));
       height: calc(100% - 176px);
       overflow:auto;
     }
-    .chatRow{
+    .row{
       display:flex;
       gap:12px;
       align-items:center;
@@ -253,26 +263,25 @@
       border-radius: 18px;
       cursor:pointer;
     }
-    .chatRow:active{ background: rgba(255,255,255,.05); }
-
+    .row:active{ background: rgba(255,255,255,.05); }
     .meta{ flex:1; min-width:0; }
-    .nameLine{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
+    .nameLine{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
     .name{
-      font-weight:1000;
       font-size:16px;
+      font-weight:1100;
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
-    .time{ font-weight:1000; font-size:13px; color:var(--muted2); }
-    .preview{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:4px; }
+    .time{ color:var(--muted2); font-weight:1100; font-size:12px; }
+    .preview{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:4px; }
     .snippet{
-      color: var(--muted);
-      font-weight:900;
+      color:var(--muted);
+      font-weight:1000;
       font-size:14px;
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
       min-width:0; flex:1;
     }
 
-    /* ---------- SEARCH ---------- */
+    /* ---------- SEARCH SCREEN ---------- */
     #scr-search{ overflow:hidden; }
     .searchTop{
       padding: 14px 16px 10px;
@@ -286,7 +295,7 @@
       border:1px solid var(--line);
       border-radius: 16px;
       padding: 12px 12px;
-      font-weight:1000;
+      font-weight:1100;
     }
     .searchField input{
       flex:1;
@@ -294,40 +303,42 @@
       background:transparent;
       color: var(--text);
       font-size:16px;
-      font-weight:1000;
+      font-weight:1100;
+      min-width:0;
     }
-    .cancel{ font-weight:1000; color:var(--text); opacity:.9; cursor:pointer; }
-
+    .cancel{
+      font-weight:1100;
+      color:var(--text);
+      opacity:.9;
+      cursor:pointer;
+      user-select:none;
+    }
     .sectionTitle{
       padding: 10px 16px 6px;
       color: var(--muted2);
-      font-weight:1000;
+      font-weight:1100;
       text-transform:uppercase;
       letter-spacing:.5px;
       font-size:12px;
     }
     .searchList{
-      padding: 0 10px 92px;
+      padding: 0 10px calc(var(--tabbar-h) + 16px + env(safe-area-inset-bottom));
       height: calc(100% - 58px);
       overflow:auto;
     }
-    .userRow{
-      display:flex; align-items:center; gap:12px;
-      padding: 12px 8px;
-      border-radius: 18px;
-      cursor:pointer;
-    }
-    .userRow:active{ background: rgba(255,255,255,.05); }
     .statusDot{
-      width:10px; height:10px; border-radius: 50%;
+      width:10px; height:10px; border-radius:50%;
       background: rgba(255,255,255,.25);
       border:1px solid rgba(255,255,255,.18);
       flex:0 0 auto;
     }
-    .statusDot.on{ background: var(--ok); border-color: rgba(34,197,94,.35); }
-    .sub{ color: var(--muted2); font-weight:900; font-size:12px; margin-top:2px; }
+    .statusDot.on{
+      background: var(--ok);
+      border-color: rgba(34,197,94,.35);
+    }
+    .sub{ color: var(--muted2); font-weight:1000; font-size:12px; margin-top:2px; }
 
-    /* ---------- CHAT ---------- */
+    /* ---------- CHAT SCREEN ---------- */
     #scr-chat{ overflow:hidden; }
     .chatWrap{
       height:100%;
@@ -341,8 +352,10 @@
     }
     .chatTop{
       padding: 12px 12px 10px;
-      padding-top: max(12px, env(safe-area-inset-top));
-      display:flex; align-items:center; gap:10px;
+      padding-top:max(12px, env(safe-area-inset-top));
+      display:flex;
+      align-items:center;
+      gap:10px;
       background: rgba(10,14,22,.82);
       border-bottom: 1px solid var(--line);
       backdrop-filter: blur(16px);
@@ -352,25 +365,35 @@
       z-index: 10;
     }
     .backBtn{
-      width:38px; height:38px;
-      border-radius: 16px;
+      width:40px; height:40px;
+      border-radius:16px;
       border:1px solid var(--line);
       background: rgba(255,255,255,.06);
       display:grid; place-items:center;
       cursor:pointer;
-      font-weight:1000;
+      font-weight:1100;
+      color:var(--text);
     }
     .chatHead{ flex:1; min-width:0; display:flex; gap:10px; align-items:center; }
-    .chatHead img{ width:42px; height:42px; border-radius:50%; border:1px solid var(--line); object-fit:cover; background:rgba(255,255,255,.08); }
     .chatMeta{ min-width:0; }
-    .chatName{ font-weight:1000; font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .chatStatus{ color: var(--muted2); font-weight:1000; font-size:12px; margin-top:2px; }
+    .chatName{
+      font-weight:1100;
+      font-size:16px;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .chatStatus{
+      color: var(--muted2);
+      font-weight:1100;
+      font-size:12px;
+      margin-top:2px;
+    }
 
     .msgs{
       flex:1;
       overflow:auto;
-      padding: 14px 12px 100px; /* место под фиксированный composer */
+      padding: 14px 12px calc(var(--tabbar-h) + var(--composer-h) + 16px + env(safe-area-inset-bottom));
     }
+
     .bubble{
       max-width: 78%;
       padding: 10px 12px;
@@ -379,7 +402,7 @@
       background: rgba(255,255,255,.07);
       border:1px solid var(--line);
       box-shadow: 0 14px 26px rgba(0,0,0,.22);
-      font-weight:900;
+      font-weight:1000;
       white-space:pre-wrap;
       word-break:break-word;
     }
@@ -393,18 +416,17 @@
       margin-top:6px;
       font-size:11px;
       color: rgba(255,255,255,.75);
-      font-weight:1000;
+      font-weight:1100;
       text-align:right;
     }
 
-    /* FIXED composer: всегда видно */
+    /* ✅ Главное: композер всегда НАД таббаром */
     .composer{
       position: fixed;
       left: 0;
       right: 0;
-      bottom: 0;
+      bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
       padding: 10px;
-      padding-bottom: max(10px, env(safe-area-inset-bottom));
       background: rgba(10,14,22,.95);
       border-top: 1px solid var(--line);
       backdrop-filter: blur(16px);
@@ -421,7 +443,8 @@
       background: rgba(255,255,255,.06);
       display:grid; place-items:center;
       cursor:pointer;
-      flex: 0 0 auto;
+      flex:0 0 auto;
+      user-select:none;
     }
     .composerInput{
       flex:1;
@@ -430,6 +453,7 @@
       border:1px solid var(--line);
       border-radius: 18px;
       padding: 10px 12px;
+      min-width:0;
     }
     .composerInput input{
       flex:1;
@@ -437,8 +461,8 @@
       background:transparent;
       color: var(--text);
       font-size:16px;
-      font-weight:1000;
-      min-width: 0;
+      font-weight:1100;
+      min-width:0;
     }
     .sendBtn{
       width:46px; height:46px;
@@ -446,16 +470,17 @@
       border:none;
       background: linear-gradient(180deg, var(--blue), var(--blue2));
       color:white;
-      font-weight:1000;
+      font-weight:1100;
       cursor:pointer;
-      flex: 0 0 auto;
+      flex:0 0 auto;
+      user-select:none;
     }
 
     /* ---------- PROFILE ---------- */
-    #scr-profile{ overflow:auto; padding-bottom: 92px; }
+    #scr-profile{ overflow:auto; padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)); }
     .profilePad{
       padding: 14px 14px;
-      padding-top: max(14px, env(safe-area-inset-top));
+      padding-top:max(14px, env(safe-area-inset-top));
     }
     .profileCard{
       border-radius: 22px;
@@ -466,25 +491,13 @@
       align-items:center;
       gap:12px;
     }
-    .profileHead img{
-      width:78px; height:78px;
-      border-radius:50%;
-      object-fit:cover;
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.08);
-    }
-    .pName{ margin:0; font-size:22px; font-weight:1000; }
-    .pSub{ margin-top:4px; color:var(--muted); font-weight:1000; font-size:13px; }
-    .profileActions{
-      margin-top:12px;
-      display:flex;
-      gap:10px;
-      flex-direction: column;
-    }
+    .pName{ margin:0; font-size:22px; font-weight:1100; }
+    .pSub{ margin-top:4px; color:var(--muted); font-weight:1100; font-size:13px; }
+
   </style>
 </head>
-<body>
 
+<body>
 <div class="app">
 
   <!-- AUTH -->
@@ -512,9 +525,9 @@
 
       <div id="regExtra" class="hidden">
         <div class="avatarPick">
-          <img id="regAvatarPreview" class="avatar" alt="" />
+          <img id="regAvatarPreview" class="avatar med" alt="">
           <div style="flex:1">
-            <div class="hint" style="font-weight:1000;margin-bottom:6px;">Аватар</div>
+            <div class="hint" style="font-weight:1100;margin-bottom:6px;">Аватар</div>
             <input id="regAvatarFile" type="file" accept="image/*"
               style="width:100%;padding:10px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--muted);" />
           </div>
@@ -532,8 +545,9 @@
       </div>
 
       <button id="authBtn" class="btn" type="button">Войти</button>
+
       <div class="hint" style="margin-top:10px;">
-        * Вариант без Firebase Auth — пароли хранятся в базе в виде SHA-256 хэша.
+        * Это вход по логину/паролю без Firebase Auth (пароль хранится как SHA-256 хэш).
       </div>
     </div>
   </section>
@@ -548,8 +562,8 @@
     <div id="openSearch" class="searchpill">🔎 Поиск по никнейму</div>
 
     <div class="banner">
-      <p class="bannerTitle">Приятный фон</p>
-      <p class="bannerText">и быстрые чаты 😎</p>
+      <p class="bannerTitle">LOL Messenger</p>
+      <p class="bannerText">чаты, статусы и typing 😎</p>
     </div>
 
     <div id="chatList" class="list"></div>
@@ -569,7 +583,7 @@
     <div class="searchList">
       <div class="sectionTitle">Результаты</div>
       <div id="searchResults"></div>
-      <div id="searchEmpty" class="hint" style="padding:10px 16px; font-weight:1000;"></div>
+      <div id="searchEmpty" class="hint" style="padding:10px 16px; font-weight:1100;"></div>
     </div>
   </section>
 
@@ -580,7 +594,7 @@
         <div id="backToChats" class="backBtn">‹</div>
 
         <div class="chatHead">
-          <img id="peerAvatar" alt="" />
+          <img id="peerAvatar" class="avatar" alt="">
           <div class="chatMeta">
             <div id="peerNick" class="chatName">Чат</div>
             <div id="peerStatus" class="chatStatus">…</div>
@@ -591,17 +605,17 @@
       </div>
 
       <div id="msgList" class="msgs"></div>
+    </div>
 
-      <!-- ВАЖНО: composer теперь fixed, всегда виден -->
-      <div class="composer">
-        <div class="toolBtn" title="Фото/видео">📎</div>
-        <div class="composerInput">
-          <input id="msgInput" placeholder="Сообщение" />
-          <span style="opacity:.85" title="Смайлики">😊</span>
-          <span style="opacity:.85" title="Фото/видео">📷</span>
-        </div>
-        <button id="sendBtn" class="sendBtn" type="button" title="Отправить">➤</button>
+    <!-- composer вынесен из chatWrap и фиксирован: НАД таббаром -->
+    <div class="composer" id="composer">
+      <div class="toolBtn" title="Фото/видео">📎</div>
+      <div class="composerInput">
+        <input id="msgInput" placeholder="Сообщение" />
+        <span title="Смайлики" style="opacity:.85; user-select:none;">😊</span>
+        <span title="Фото/видео" style="opacity:.85; user-select:none;">📷</span>
       </div>
+      <button id="sendBtn" class="sendBtn" type="button" title="Отправить">➤</button>
     </div>
   </section>
 
@@ -615,7 +629,7 @@
 
       <div class="profileCard glass">
         <div class="profileHead">
-          <img id="meAvatar" alt="" />
+          <img id="meAvatar" class="avatar big" alt="">
           <div style="flex:1; min-width:0;">
             <h2 id="meNick" class="pName">…</h2>
             <div id="mePhone" class="pSub">…</div>
@@ -626,9 +640,9 @@
         <div style="height:12px"></div>
 
         <div class="avatarPick" style="margin:0 0 10px;">
-          <img id="editAvatarPreview" class="avatar" alt="" />
+          <img id="editAvatarPreview" class="avatar med" alt="">
           <div style="flex:1">
-            <div class="hint" style="font-weight:1000;margin-bottom:6px;">Сменить аватар</div>
+            <div class="hint" style="font-weight:1100;margin-bottom:6px;">Сменить аватар</div>
             <input id="editAvatarFile" type="file" accept="image/*"
               style="width:100%;padding:10px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--muted);" />
           </div>
@@ -638,22 +652,22 @@
           <label>Никнейм</label>
           <input id="editNick" />
         </div>
+
         <div class="field">
           <label>Номер телефона</label>
           <input id="editPhone" />
         </div>
 
-        <div class="profileActions">
-          <button id="saveProfileBtn" class="btn" type="button">Сохранить</button>
-          <button id="resetDeviceBtn" class="btn ghost" type="button">Сбросить устройство</button>
-        </div>
+        <button id="saveProfileBtn" class="btn" type="button">Сохранить</button>
+        <div style="height:10px"></div>
+        <button id="resetDeviceBtn" class="btn ghost" type="button">Сбросить устройство</button>
 
         <div id="profileMsg" class="hidden" style="margin-top:10px;"></div>
       </div>
     </div>
   </section>
 
-  <!-- Bottom tabs -->
+  <!-- TABBAR -->
   <nav id="bottomNav" class="nav hidden">
     <div class="navWrap">
       <div class="navItem active" data-tab="chats">
@@ -696,16 +710,31 @@ const now = () => Date.now();
 const pad2 = (n)=> String(n).padStart(2,"0");
 const fmtTime = (ms)=> { const d=new Date(ms); return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`; };
 
+function escapeHtml(str){
+  return (str ?? "").toString()
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
 function showScreen(id){
   ["scr-auth","scr-chats","scr-search","scr-chat","scr-profile"].forEach(x => $(x).classList.remove("active"));
   $(id).classList.add("active");
+
+  // показываем композер только в чате
+  $("composer").style.display = (id === "scr-chat") ? "flex" : "none";
 }
 
-function setTab(tab){
-  document.querySelectorAll(".navItem").forEach(x=>x.classList.remove("active"));
-  document.querySelector(`.navItem[data-tab="${tab}"]`)?.classList.add("active");
-  if(tab==="chats"){ showScreen("scr-chats"); }
-  if(tab==="profile"){ showScreen("scr-profile"); }
+function setMsg(el, text, kind){
+  el.className = (kind === "ok") ? "ok" : "err";
+  el.textContent = text;
+  el.classList.remove("hidden");
+}
+function clearMsg(el){
+  el.textContent = "";
+  el.classList.add("hidden");
 }
 
 function randId(prefix="u"){
@@ -720,15 +749,7 @@ async function sha256Hex(text){
   return bytes.map(b => b.toString(16).padStart(2,"0")).join("");
 }
 
-function setMsg(el, html, kind){
-  el.className = kind === "ok" ? "ok" : "err";
-  el.innerHTML = html;
-  el.classList.remove("hidden");
-}
-function clearMsg(el){
-  el.classList.add("hidden");
-  el.innerHTML = "";
-}
+function chatIdFor(a,b){ return [a,b].sort().join("_"); }
 
 function isOnline(u){
   const ls = u.lastSeen || 0;
@@ -738,65 +759,9 @@ function onlineText(u){
   return isOnline(u) ? "онлайн" : "оффлайн";
 }
 
-function chatIdFor(a,b){
-  return [a,b].sort().join("_");
-}
-function escapeHtml(str){
-  return (str ?? "").toString()
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-
 /* =========================
-   State
+   Default avatar (inline svg)
 ========================= */
-let session = null; // { uid, login }
-let me = null;      // {uid, ...data}
-let usersCache = new Map(); // uid -> {uid,...}
-let peer = null;    // {uid,...}
-let currentChatId = null;
-
-let unsubMsgs = null;
-let unsubPeer = null;
-let unsubChatList = null;
-let heartbeatTimer = null;
-let typingTimer = null;
-let typingClearTimer = null;
-
-/* =========================
-   Session persistence
-========================= */
-function loadSession(){
-  try{
-    const s = JSON.parse(localStorage.getItem("lol_session") || "null");
-    return s && s.uid ? s : null;
-  }catch{ return null; }
-}
-function saveSession(s){
-  localStorage.setItem("lol_session", JSON.stringify(s));
-}
-function clearSession(){
-  localStorage.removeItem("lol_session");
-}
-
-/* =========================
-   Auth UI toggle
-========================= */
-let authMode = "login"; // login | reg
-function setAuthMode(mode){
-  authMode = mode;
-  $("segLogin").classList.toggle("active", mode==="login");
-  $("segReg").classList.toggle("active", mode==="reg");
-  $("regExtra").classList.toggle("hidden", mode!=="reg");
-  $("authBtn").textContent = mode==="login" ? "Войти" : "Создать аккаунт";
-  clearMsg($("authMsg"));
-}
-$("segLogin").addEventListener("click", ()=> setAuthMode("login"));
-$("segReg").addEventListener("click", ()=> setAuthMode("reg"));
-
 const defaultAvatar = "data:image/svg+xml;base64," + btoa(`
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256">
   <defs>
@@ -810,6 +775,52 @@ const defaultAvatar = "data:image/svg+xml;base64," + btoa(`
   <path d="M48 218c18-44 54-66 80-66s62 22 80 66" fill="rgba(255,255,255,.78)"/>
 </svg>
 `);
+
+/* =========================
+   State
+========================= */
+let authMode = "login"; // login | reg
+let session = null;     // { uid, login }
+let me = null;          // { uid, ... }
+let usersCache = new Map();
+
+let peer = null;        // {uid,...}
+let currentChatId = null;
+
+let unsubChatList = null;
+let unsubMsgs = null;
+let unsubPeer = null;
+
+let heartbeatTimer = null;
+let typingTimer = null;
+let typingClearTimer = null;
+
+/* =========================
+   Session persistence
+========================= */
+function loadSession(){
+  try{
+    const s = JSON.parse(localStorage.getItem("lol_session") || "null");
+    return s && s.uid ? s : null;
+  }catch{ return null; }
+}
+function saveSession(s){ localStorage.setItem("lol_session", JSON.stringify(s)); }
+function clearSession(){ localStorage.removeItem("lol_session"); }
+
+/* =========================
+   Auth UI
+========================= */
+function setAuthMode(mode){
+  authMode = mode;
+  $("segLogin").classList.toggle("active", mode==="login");
+  $("segReg").classList.toggle("active", mode==="reg");
+  $("regExtra").classList.toggle("hidden", mode!=="reg");
+  $("authBtn").textContent = mode==="login" ? "Войти" : "Создать аккаунт";
+  clearMsg($("authMsg"));
+}
+$("segLogin").addEventListener("click", ()=> setAuthMode("login"));
+$("segReg").addEventListener("click", ()=> setAuthMode("reg"));
+
 $("regAvatarPreview").src = defaultAvatar;
 
 function bindAvatarInput(fileEl, imgEl){
@@ -825,15 +836,72 @@ bindAvatarInput($("regAvatarFile"), $("regAvatarPreview"));
 bindAvatarInput($("editAvatarFile"), $("editAvatarPreview"));
 
 /* =========================
-   Auth actions
+   Data access
 ========================= */
+async function warmUsersCache(){
+  const snap = await db.collection("users").get();
+  usersCache.clear();
+  snap.forEach(d => usersCache.set(d.id, { uid:d.id, ...d.data() }));
+  if(session && usersCache.has(session.uid)) me = usersCache.get(session.uid);
+}
+
+async function loadMe(){
+  const snap = await db.collection("users").doc(session.uid).get();
+  if(!snap.exists) throw new Error("Аккаунт не найден.");
+  me = { uid: snap.id, ...snap.data() };
+  usersCache.set(me.uid, me);
+}
+
 async function findUserByLogin(login){
   const snap = await db.collection("users").where("login","==",login).limit(1).get();
   if (snap.empty) return null;
-  const doc = snap.docs[0];
-  return { uid: doc.id, data: doc.data() };
+  const d = snap.docs[0];
+  return { uid: d.id, data: d.data() };
 }
 
+/* =========================
+   Online / heartbeat
+========================= */
+async function setOnline(flag){
+  if(!session) return;
+  try{
+    await db.collection("users").doc(session.uid).set({
+      online: !!flag,
+      lastSeen: now()
+    }, { merge:true });
+  }catch{}
+}
+
+function startHeartbeat(){
+  stopHeartbeat();
+  heartbeatTimer = setInterval(()=> setOnline(true), 15000);
+}
+function stopHeartbeat(){
+  if(heartbeatTimer){ clearInterval(heartbeatTimer); heartbeatTimer=null; }
+}
+
+window.addEventListener("beforeunload", ()=> setOnline(false));
+document.addEventListener("visibilitychange", ()=>{
+  if(document.hidden) setOnline(false);
+  else setOnline(true);
+});
+
+/* =========================
+   Tabs
+========================= */
+function setTab(tab){
+  document.querySelectorAll(".navItem").forEach(x=>x.classList.remove("active"));
+  document.querySelector(`.navItem[data-tab="${tab}"]`)?.classList.add("active");
+  if(tab==="chats") showScreen("scr-chats");
+  if(tab==="profile") showScreen("scr-profile");
+}
+document.querySelectorAll(".navItem").forEach(el=>{
+  el.addEventListener("click", ()=> setTab(el.getAttribute("data-tab")));
+});
+
+/* =========================
+   Auth action
+========================= */
 $("authBtn").addEventListener("click", async ()=>{
   clearMsg($("authMsg"));
   const login = $("loginLogin").value.trim();
@@ -850,7 +918,7 @@ $("authBtn").addEventListener("click", async ()=>{
       const avatar = $("regAvatarPreview").src || defaultAvatar;
 
       if(!nick){
-        return setMsg($("authMsg"), "Нужен никнейм для регистрации.", "err");
+        return setMsg($("authMsg"), "Нужен никнейм.", "err");
       }
 
       const exists = await findUserByLogin(login);
@@ -858,11 +926,11 @@ $("authBtn").addEventListener("click", async ()=>{
         return setMsg($("authMsg"), "Такой логин уже занят.", "err");
       }
 
-      const uid = randId("u");
+      const uid  = randId("u");
       const salt = randId("s");
       const passwordHash = await sha256Hex(`${login}:${pass}:${salt}`);
 
-      const userDoc = {
+      await db.collection("users").doc(uid).set({
         login,
         salt,
         passwordHash,
@@ -873,9 +941,7 @@ $("authBtn").addEventListener("click", async ()=>{
         lastSeen: now(),
         typingTo: "",
         typingAt: 0
-      };
-
-      await db.collection("users").doc(uid).set(userDoc);
+      });
 
       session = { uid, login };
       saveSession(session);
@@ -898,72 +964,62 @@ $("authBtn").addEventListener("click", async ()=>{
     saveSession(session);
     await afterLogin();
   }catch(e){
-    setMsg($("authMsg"), "Ошибка: " + (e && e.message ? e.message : String(e)), "err");
+    setMsg($("authMsg"), "Ошибка: " + (e?.message || String(e)), "err");
   }
 });
 
 /* =========================
-   Online / heartbeat
-========================= */
-async function setOnline(flag){
-  if(!session) return;
-  try{
-    await db.collection("users").doc(session.uid).set({
-      online: !!flag,
-      lastSeen: now()
-    }, { merge:true });
-  }catch{}
-}
-function startHeartbeat(){
-  stopHeartbeat();
-  heartbeatTimer = setInterval(()=> setOnline(true), 15000);
-}
-function stopHeartbeat(){
-  if(heartbeatTimer){ clearInterval(heartbeatTimer); heartbeatTimer=null; }
-}
-window.addEventListener("beforeunload", ()=> setOnline(false));
-document.addEventListener("visibilitychange", ()=>{
-  if(document.hidden) setOnline(false);
-  else setOnline(true);
-});
-
-/* =========================
-   Load me + cache
-========================= */
-async function loadMe(){
-  const snap = await db.collection("users").doc(session.uid).get();
-  if(!snap.exists) throw new Error("Аккаунт удалён/не найден.");
-  me = { uid: snap.id, ...snap.data() };
-  usersCache.set(me.uid, me);
-}
-async function warmUsersCache(){
-  const snap = await db.collection("users").get();
-  usersCache.clear();
-  snap.forEach(d => usersCache.set(d.id, { uid:d.id, ...d.data() }));
-  if(session && usersCache.has(session.uid)) me = usersCache.get(session.uid);
-}
-
-/* =========================
-   Main render
+   After login / logout
 ========================= */
 async function afterLogin(){
   $("bottomNav").classList.remove("hidden");
   await setOnline(true);
   startHeartbeat();
+
   await warmUsersCache();
   await loadMe();
   renderProfile();
+
   bindChatListRealtime();
+
   showScreen("scr-chats");
   setTab("chats");
 }
 
+async function logout(){
+  try{ await clearMyTyping(); }catch{}
+  try{ await setOnline(false); }catch{}
+  stopHeartbeat();
+
+  if(unsubChatList){ unsubChatList(); unsubChatList=null; }
+  if(unsubMsgs){ unsubMsgs(); unsubMsgs=null; }
+  if(unsubPeer){ unsubPeer(); unsubPeer=null; }
+
+  session=null; me=null; peer=null; currentChatId=null;
+  usersCache.clear();
+
+  clearSession();
+  $("bottomNav").classList.add("hidden");
+  showScreen("scr-auth");
+}
+$("btnLogout").addEventListener("click", logout);
+$("btnLogout2").addEventListener("click", logout);
+
+$("resetDeviceBtn").addEventListener("click", ()=>{
+  localStorage.removeItem("lol_session");
+  location.reload();
+});
+
+/* =========================
+   Profile
+========================= */
 function renderProfile(){
   if(!me) return;
   $("meAvatar").src = me.avatar || defaultAvatar;
   $("meNick").textContent = me.nick || "Кто-то";
   $("mePhone").textContent = me.phone || "";
   $("meLogin").textContent = "Логин: " + (me.login || "");
+
   $("editAvatarPreview").src = me.avatar || defaultAvatar;
   $("editNick").value = me.nick || "";
   $("editPhone").value = me.phone || "";
@@ -982,44 +1038,13 @@ $("saveProfileBtn").addEventListener("click", async ()=>{
     renderProfile();
     setMsg($("profileMsg"), "Сохранено ✅", "ok");
   }catch(e){
-    setMsg($("profileMsg"), "Ошибка: " + (e && e.message ? e.message : String(e)), "err");
+    setMsg($("profileMsg"), "Ошибка: " + (e?.message || String(e)), "err");
   }
 });
 
-$("resetDeviceBtn").addEventListener("click", ()=>{
-  localStorage.removeItem("lol_session");
-  localStorage.removeItem("lol_user");
-  location.reload();
-});
-
-/* Logout */
-async function logout(){
-  try{ await setOnline(false); }catch{}
-  stopHeartbeat();
-  if(unsubMsgs) { unsubMsgs(); unsubMsgs=null; }
-  if(unsubPeer) { unsubPeer(); unsubPeer=null; }
-  if(unsubChatList){ unsubChatList(); unsubChatList=null; }
-  session = null; me = null; peer = null; currentChatId = null;
-  clearSession();
-  $("bottomNav").classList.add("hidden");
-  showScreen("scr-auth");
-}
-$("btnLogout").addEventListener("click", logout);
-$("btnLogout2").addEventListener("click", logout);
-
-/* Tabs */
-document.querySelectorAll(".navItem").forEach(el=>{
-  el.addEventListener("click", ()=>{
-    const tab = el.getAttribute("data-tab");
-    setTab(tab);
-    if(tab==="chats") showScreen("scr-chats");
-    if(tab==="profile") showScreen("scr-profile");
-  });
-});
-
 /* =========================
-   Chats list (realtime)
-   чат появляется в списке после первого сообщения (lastTime>0)
+   Chats list realtime
+   (чат появляется после первого сообщения: lastTime > 0)
 ========================= */
 function bindChatListRealtime(){
   if(!me) return;
@@ -1046,7 +1071,7 @@ function bindChatListRealtime(){
         const div=document.createElement("div");
         div.style.padding="10px 16px";
         div.style.color="rgba(234,241,255,.55)";
-        div.style.fontWeight="1000";
+        div.style.fontWeight="1100";
         div.textContent="Пока нет чатов. Нажми поиск и напиши кому-нибудь.";
         box.appendChild(div);
         return;
@@ -1054,12 +1079,12 @@ function bindChatListRealtime(){
 
       for(const c of items){
         const peerId = (c.participants||[]).find(x=>x!==me.uid);
-        const u = usersCache.get(peerId) || { nick:"Кто-то", avatar: defaultAvatar };
+        const u = usersCache.get(peerId) || { nick:"Кто-то", avatar: defaultAvatar, online:false, lastSeen:0 };
 
         const row=document.createElement("div");
-        row.className="chatRow";
+        row.className="row";
         row.innerHTML=`
-          <img class="avatar" src="${u.avatar || defaultAvatar}" alt="">
+          <img class="avatar" src="${escapeHtml(u.avatar || defaultAvatar)}" alt="">
           <div class="meta">
             <div class="nameLine">
               <div class="name">${escapeHtml(u.nick || "Кто-то")}</div>
@@ -1074,13 +1099,12 @@ function bindChatListRealtime(){
         box.appendChild(row);
       }
     }, (err)=>{
-      $("chatList").innerHTML = `<div class="err" style="margin:10px;">Ошибка чтения чатов: ${escapeHtml(err.message||String(err))}</div>`;
+      $("chatList").innerHTML = `<div class="err" style="margin:10px;">Ошибка чтения чатов: ${escapeHtml(err?.message || String(err))}</div>`;
     });
 }
 
 /* =========================
-   Search (отдельный экран)
-   исключаем себя (uid + login)
+   Search screen
 ========================= */
 $("openSearch").addEventListener("click", async ()=>{
   await warmUsersCache();
@@ -1090,7 +1114,9 @@ $("openSearch").addEventListener("click", async ()=>{
   showScreen("scr-search");
   $("searchInput").focus();
 });
+
 $("cancelSearch").addEventListener("click", ()=> showScreen("scr-chats"));
+
 $("clearSearch").addEventListener("click", ()=>{
   $("searchInput").value = "";
   $("searchResults").innerHTML = "";
@@ -1129,11 +1155,11 @@ $("searchInput").addEventListener("input", ()=>{
 
   for(const u of found.slice(0, 40)){
     const row=document.createElement("div");
-    row.className="userRow";
+    row.className="row";
     row.innerHTML=`
-      <img class="avatar" src="${u.avatar || defaultAvatar}" alt="">
+      <img class="avatar" src="${escapeHtml(u.avatar || defaultAvatar)}" alt="">
       <div class="meta">
-        <div class="nameLine" style="justify-content:flex-start;">
+        <div class="nameLine" style="justify-content:flex-start; gap:10px;">
           <div class="name" style="max-width:68%;">${escapeHtml(u.nick || "Кто-то")}</div>
           <div class="statusDot ${isOnline(u) ? "on" : ""}" title="${isOnline(u) ? "онлайн" : "оффлайн"}"></div>
         </div>
@@ -1146,36 +1172,29 @@ $("searchInput").addEventListener("input", ()=>{
 });
 
 /* =========================
-   Chat
-   - header status: онлайн/оффлайн или "Печатает…"
+   Chat: open / close / messages
 ========================= */
 function stopPeerWatch(){
   if(unsubPeer){ unsubPeer(); unsubPeer=null; }
 }
-async function clearMyTyping(){
-  if(!session) return;
-  try{
-    await db.collection("users").doc(me.uid).set({ typingTo:"", typingAt:0 }, { merge:true });
-  }catch{}
-}
-async function setMyTyping(){
-  if(!peer || !session) return;
-  try{
-    await db.collection("users").doc(me.uid).set({ typingTo: peer.uid, typingAt: now() }, { merge:true });
-  }catch{}
+
+function stopMsgWatch(){
+  if(unsubMsgs){ unsubMsgs(); unsubMsgs=null; }
 }
 
 async function openChat(peerId){
   await warmUsersCache();
-  peer = usersCache.get(peerId) || null;
-  if(!peer){ alert("Пользователь не найден"); return; }
+  const u = usersCache.get(peerId);
+  if(!u){ alert("Пользователь не найден"); return; }
 
+  peer = u;
   currentChatId = chatIdFor(me.uid, peerId);
 
   $("peerAvatar").src = peer.avatar || defaultAvatar;
   $("peerNick").textContent = peer.nick || "Кто-то";
   $("peerStatus").textContent = onlineText(peer);
 
+  // watch peer online + typing
   stopPeerWatch();
   unsubPeer = db.collection("users").doc(peerId).onSnapshot((snap)=>{
     if(!snap.exists) return;
@@ -1186,14 +1205,19 @@ async function openChat(peerId){
     $("peerStatus").textContent = typing ? "Печатает…" : onlineText(peer);
   });
 
-  // ensure chat doc exists (не показываем в списке, пока не будет first message)
+  // ensure chat doc exists
   const chatRef = db.collection("chats").doc(currentChatId);
   const chatSnap = await chatRef.get();
   if(!chatSnap.exists){
-    await chatRef.set({ participants:[me.uid, peerId], lastText:"", lastTime:0 });
+    await chatRef.set({
+      participants:[me.uid, peerId],
+      lastText:"",
+      lastTime:0
+    });
   }
 
-  if(unsubMsgs){ unsubMsgs(); unsubMsgs=null; }
+  // watch messages
+  stopMsgWatch();
   unsubMsgs = chatRef.collection("messages").orderBy("time").onSnapshot((ss)=>{
     const box = $("msgList");
     box.innerHTML = "";
@@ -1213,6 +1237,7 @@ async function openChat(peerId){
 
   $("msgInput").value = "";
   await clearMyTyping();
+
   showScreen("scr-chat");
   $("msgInput").focus();
 }
@@ -1221,14 +1246,15 @@ function closeChat(){
   clearMyTyping();
   showScreen("scr-chats");
 }
+
 $("backToChats").addEventListener("click", closeChat);
 $("exitChat").addEventListener("click", closeChat);
 
 async function sendMessage(){
   const text = $("msgInput").value.trim();
   if(!text || !currentChatId || !peer) return;
-  $("msgInput").value = "";
 
+  $("msgInput").value = "";
   const chatRef = db.collection("chats").doc(currentChatId);
 
   await chatRef.collection("messages").add({
@@ -1237,6 +1263,7 @@ async function sendMessage(){
     time: now()
   });
 
+  // chat appears in list after first message (lastTime > 0)
   await chatRef.set({
     participants: [me.uid, peer.uid],
     lastText: text,
@@ -1250,15 +1277,42 @@ $("sendBtn").addEventListener("click", sendMessage);
 $("msgInput").addEventListener("keydown", (e)=>{
   if(e.key === "Enter") sendMessage();
 });
+
+/* =========================
+   Typing ("Печатает…")
+========================= */
+async function setMyTyping(){
+  if(!peer || !session) return;
+  try{
+    await db.collection("users").doc(me.uid).set({
+      typingTo: peer.uid,
+      typingAt: now()
+    }, { merge:true });
+  }catch{}
+}
+
+async function clearMyTyping(){
+  if(!session || !me) return;
+  try{
+    await db.collection("users").doc(me.uid).set({
+      typingTo: "",
+      typingAt: 0
+    }, { merge:true });
+  }catch{}
+}
+
 $("msgInput").addEventListener("input", ()=>{
   if(!peer) return;
 
+  // throttle sending typing
   if(!typingTimer){
     typingTimer = setTimeout(async ()=>{
       typingTimer = null;
       await setMyTyping();
     }, 150);
   }
+
+  // clear after idle
   if(typingClearTimer) clearTimeout(typingClearTimer);
   typingClearTimer = setTimeout(()=> clearMyTyping(), 1200);
 });
@@ -1267,6 +1321,9 @@ $("msgInput").addEventListener("input", ()=>{
    Boot
 ========================= */
 (async ()=>{
+  // composer hidden until chat
+  $("composer").style.display = "none";
+
   const s = loadSession();
   if(s && s.uid){
     session = s;
@@ -1282,6 +1339,5 @@ $("msgInput").addEventListener("input", ()=>{
   }
 })();
 </script>
-
 </body>
 </html>
