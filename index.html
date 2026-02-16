@@ -9,16 +9,13 @@
     :root{
       --bg:#070a10;
       --panel:rgba(18,24,38,.72);
-      --panel2:rgba(14,18,28,.82);
       --line:rgba(255,255,255,.08);
       --text:#eaf1ff;
       --muted:rgba(234,241,255,.62);
       --muted2:rgba(234,241,255,.40);
       --blue:#2b86ff;
       --blue2:#1f6bff;
-      --pink:#a855f7;
       --ok:#22c55e;
-      --bad:#ef4444;
       --shadow:0 18px 45px rgba(0,0,0,.45);
       --r:18px;
     }
@@ -37,12 +34,10 @@
       overflow:hidden;
     }
 
-    /* App shells */
     .app{ height:100%; display:flex; flex-direction:column; }
     .screen{ flex:1; display:none; overflow:hidden; }
     .screen.active{ display:block; }
 
-    /* Glass panels */
     .glass{
       background:var(--panel);
       border:1px solid var(--line);
@@ -51,7 +46,6 @@
       box-shadow: var(--shadow);
     }
 
-    /* Buttons / inputs */
     .btn{
       width:100%;
       padding:12px 14px;
@@ -67,8 +61,6 @@
       border:1px solid var(--line);
       color:var(--text);
     }
-    .btn.small{ width:auto; padding:10px 12px; border-radius:14px; }
-    .btn.danger{ background: linear-gradient(180deg, #fb7185, #ef4444); }
 
     .field{
       background: rgba(255,255,255,.06);
@@ -96,10 +88,11 @@
     }
 
     .hint{ color:var(--muted); font-weight:800; font-size:13px; }
-    .err{ color: #fecaca; background: rgba(239,68,68,.14); border: 1px solid rgba(239,68,68,.25); padding:10px 12px; border-radius:16px; font-weight:900; }
-    .ok{ color: #bbf7d0; background: rgba(34,197,94,.12); border: 1px solid rgba(34,197,94,.22); padding:10px 12px; border-radius:16px; font-weight:900; }
+    .err{ color:#fecaca; background: rgba(239,68,68,.14); border: 1px solid rgba(239,68,68,.25); padding:10px 12px; border-radius:16px; font-weight:900; }
+    .ok{ color:#bbf7d0; background: rgba(34,197,94,.12); border: 1px solid rgba(34,197,94,.22); padding:10px 12px; border-radius:16px; font-weight:900; }
+    .hidden{ display:none !important; }
 
-    /* ---------- AUTH SCREEN ---------- */
+    /* ---------- AUTH ---------- */
     #scr-auth{
       padding: 18px 14px;
       padding-top: max(18px, env(safe-area-inset-top));
@@ -161,7 +154,7 @@
       flex:0 0 auto;
     }
 
-    /* ---------- MAIN: topbars ---------- */
+    /* ---------- TOPBARS ---------- */
     .topbar{
       padding: 14px 16px 10px;
       padding-top: max(14px, env(safe-area-inset-top));
@@ -186,7 +179,7 @@
       cursor:pointer;
     }
 
-    /* ---------- TABS (bottom) ---------- */
+    /* ---------- BOTTOM TABS ---------- */
     .nav{
       position:fixed; left:0; right:0; bottom:0;
       padding-bottom: max(10px, env(safe-area-inset-bottom));
@@ -194,6 +187,7 @@
       border-top: 1px solid var(--line);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
+      z-index: 1000;
     }
     .navWrap{
       display:flex;
@@ -210,12 +204,11 @@
       color: var(--muted2);
       font-weight:1000;
       font-size:12px;
-      position:relative;
     }
     .navItem.active{ color: var(--blue); }
     .navIcon{ width:26px; height:26px; display:grid; place-items:center; }
 
-    /* ---------- CHATS SCREEN ---------- */
+    /* ---------- CHATS ---------- */
     #scr-chats{ overflow:hidden; }
     .searchpill{
       margin: 0 16px 10px;
@@ -233,7 +226,7 @@
       border-radius: 18px;
       padding: 16px 14px;
       background: linear-gradient(135deg, #7c3aed 0%, #2563eb 55%, #0ea5e9 100%);
-      box-shadow: var(--shadow);
+      box-shadow:var(--shadow);
       position:relative;
       overflow:hidden;
     }
@@ -279,11 +272,11 @@
       min-width:0; flex:1;
     }
 
-    /* ---------- SEARCH MODAL SCREEN ---------- */
+    /* ---------- SEARCH ---------- */
     #scr-search{ overflow:hidden; }
     .searchTop{
       padding: 14px 16px 10px;
-      padding-top: max(14px, env(safe-area-inset-top));
+      padding-top:max(14px, env(safe-area-inset-top));
       display:flex; gap:10px; align-items:center;
     }
     .searchField{
@@ -334,7 +327,7 @@
     .statusDot.on{ background: var(--ok); border-color: rgba(34,197,94,.35); }
     .sub{ color: var(--muted2); font-weight:900; font-size:12px; margin-top:2px; }
 
-    /* ---------- CHAT SCREEN ---------- */
+    /* ---------- CHAT ---------- */
     #scr-chat{ overflow:hidden; }
     .chatWrap{
       height:100%;
@@ -354,6 +347,9 @@
       border-bottom: 1px solid var(--line);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
     .backBtn{
       width:38px; height:38px;
@@ -373,7 +369,7 @@
     .msgs{
       flex:1;
       overflow:auto;
-      padding: 14px 12px 10px;
+      padding: 14px 12px 100px; /* место под фиксированный composer */
     }
     .bubble{
       max-width: 78%;
@@ -401,16 +397,22 @@
       text-align:right;
     }
 
+    /* FIXED composer: всегда видно */
     .composer{
-      padding: 10px 10px;
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 10px;
       padding-bottom: max(10px, env(safe-area-inset-bottom));
-      background: rgba(10,14,22,.86);
+      background: rgba(10,14,22,.95);
       border-top: 1px solid var(--line);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       display:flex;
       gap:8px;
       align-items:center;
+      z-index: 999;
     }
     .toolBtn{
       width:40px; height:40px;
@@ -419,6 +421,7 @@
       background: rgba(255,255,255,.06);
       display:grid; place-items:center;
       cursor:pointer;
+      flex: 0 0 auto;
     }
     .composerInput{
       flex:1;
@@ -435,6 +438,7 @@
       color: var(--text);
       font-size:16px;
       font-weight:1000;
+      min-width: 0;
     }
     .sendBtn{
       width:46px; height:46px;
@@ -444,6 +448,7 @@
       color:white;
       font-weight:1000;
       cursor:pointer;
+      flex: 0 0 auto;
     }
 
     /* ---------- PROFILE ---------- */
@@ -474,10 +479,8 @@
       margin-top:12px;
       display:flex;
       gap:10px;
+      flex-direction: column;
     }
-
-    /* Tiny helper */
-    .hidden{ display:none !important; }
   </style>
 </head>
 <body>
@@ -491,8 +494,8 @@
 
     <div class="authCard glass">
       <div class="seg">
-        <button id="segLogin" class="active">Вход</button>
-        <button id="segReg">Регистрация</button>
+        <button id="segLogin" class="active" type="button">Вход</button>
+        <button id="segReg" type="button">Регистрация</button>
       </div>
 
       <div id="authMsg" class="hidden"></div>
@@ -507,7 +510,6 @@
         <input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password" />
       </div>
 
-      <!-- Register extra -->
       <div id="regExtra" class="hidden">
         <div class="avatarPick">
           <img id="regAvatarPreview" class="avatar" alt="" />
@@ -529,9 +531,9 @@
         </div>
       </div>
 
-      <button id="authBtn" class="btn">Войти</button>
+      <button id="authBtn" class="btn" type="button">Войти</button>
       <div class="hint" style="margin-top:10px;">
-        * Вариант без Firebase Auth — пароли хранятся в базе в виде хэша.
+        * Вариант без Firebase Auth — пароли хранятся в базе в виде SHA-256 хэша.
       </div>
     </div>
   </section>
@@ -540,26 +542,26 @@
   <section id="scr-chats" class="screen">
     <div class="topbar">
       <h1>Чаты</h1>
-      <button id="btnLogout" class="iconbtn" title="Выйти">⎋</button>
+      <button id="btnLogout" class="iconbtn" type="button" title="Выйти">⎋</button>
     </div>
 
     <div id="openSearch" class="searchpill">🔎 Поиск по никнейму</div>
 
     <div class="banner">
-      <div class="bannerTitle">Приятный фон</div>
-      <div class="bannerText">и быстрые чаты 😎</div>
+      <p class="bannerTitle">Приятный фон</p>
+      <p class="bannerText">и быстрые чаты 😎</p>
     </div>
 
     <div id="chatList" class="list"></div>
   </section>
 
-  <!-- SEARCH (отдельный экран поиска) -->
+  <!-- SEARCH -->
   <section id="scr-search" class="screen">
     <div class="searchTop">
       <div class="searchField">
         🔎
         <input id="searchInput" placeholder="Никнейм..." />
-        <button id="clearSearch" class="iconbtn" style="width:34px;height:34px;border-radius:14px;">✕</button>
+        <button id="clearSearch" class="iconbtn" type="button" style="width:34px;height:34px;border-radius:14px;">✕</button>
       </div>
       <div id="cancelSearch" class="cancel">Отмена</div>
     </div>
@@ -585,88 +587,20 @@
           </div>
         </div>
 
-        <button id="exitChat" class="iconbtn" title="Выйти из чата">⤬</button>
+        <button id="exitChat" class="iconbtn" type="button" title="Выйти из чата">⤬</button>
       </div>
 
       <div id="msgList" class="msgs"></div>
 
-      /* ЧАТ — список сообщений */
-.msgs{
-  flex:1;
-  overflow:auto;
-  padding: 14px 12px 90px; /* место под нижнюю панель */
-}
-
-/* НИЖНЯЯ ПАНЕЛЬ ВВОДА */
-.composer{
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 10px;
-  padding-bottom: max(10px, env(safe-area-inset-bottom));
-  background: rgba(10,14,22,.95);
-  border-top: 1px solid rgba(255,255,255,.08);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  display:flex;
-  gap:8px;
-  align-items:center;
-  z-index: 999;
-}
-
-/* поле ввода */
-.composerInput{
-  flex:1;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  background: rgba(255,255,255,.06);
-  border:1px solid rgba(255,255,255,.08);
-  border-radius: 18px;
-  padding: 10px 12px;
-}
-
-.composerInput input{
-  flex:1;
-  border:none;
-  outline:none;
-  background:transparent;
-  color:white;
-  font-size:16px;
-  font-weight:700;
-}
-
-/* кнопка отправки */
-.sendBtn{
-  width:46px;
-  height:46px;
-  border-radius: 16px;
-  border:none;
-  background: linear-gradient(180deg,#2b86ff,#1f6bff);
-  color:white;
-  font-size:18px;
-  font-weight:900;
-  cursor:pointer;
-}
-
-/* кнопка вложений */
-.toolBtn{
-  width:40px;
-  height:40px;
-  border-radius: 16px;
-  border:1px solid rgba(255,255,255,.08);
-  background: rgba(255,255,255,.06);
-  display:grid;
-  place-items:center;
-  cursor:pointer;
-}
-        <div class="toolBtn">📎</div>
+      <!-- ВАЖНО: composer теперь fixed, всегда виден -->
+      <div class="composer">
+        <div class="toolBtn" title="Фото/видео">📎</div>
         <div class="composerInput">
           <input id="msgInput" placeholder="Сообщение" />
-          <span style="opacity:.8">😊</span>
+          <span style="opacity:.85" title="Смайлики">😊</span>
+          <span style="opacity:.85" title="Фото/видео">📷</span>
         </div>
-        <button id="sendBtn" class="sendBtn">➤</button>
+        <button id="sendBtn" class="sendBtn" type="button" title="Отправить">➤</button>
       </div>
     </div>
   </section>
@@ -676,7 +610,7 @@
     <div class="profilePad">
       <div class="topbar" style="padding:0 2px 10px; padding-top:0;">
         <h1>Профиль</h1>
-        <button id="btnLogout2" class="iconbtn" title="Выйти">⎋</button>
+        <button id="btnLogout2" class="iconbtn" type="button" title="Выйти">⎋</button>
       </div>
 
       <div class="profileCard glass">
@@ -710,8 +644,8 @@
         </div>
 
         <div class="profileActions">
-          <button id="saveProfileBtn" class="btn">Сохранить</button>
-          <button id="resetDeviceBtn" class="btn ghost">Сбросить устройство</button>
+          <button id="saveProfileBtn" class="btn" type="button">Сохранить</button>
+          <button id="resetDeviceBtn" class="btn ghost" type="button">Сбросить устройство</button>
         </div>
 
         <div id="profileMsg" class="hidden" style="margin-top:10px;"></div>
@@ -735,7 +669,7 @@
 
 </div>
 
-<!-- Firebase compat (стабильно на телефоне, без module/import) -->
+<!-- Firebase compat -->
 <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
 
@@ -770,8 +704,8 @@ function showScreen(id){
 function setTab(tab){
   document.querySelectorAll(".navItem").forEach(x=>x.classList.remove("active"));
   document.querySelector(`.navItem[data-tab="${tab}"]`)?.classList.add("active");
-  if(tab==="chats"){ showScreen("scr-chats"); renderChatList(); }
-  if(tab==="profile"){ showScreen("scr-profile"); renderProfile(); }
+  if(tab==="chats"){ showScreen("scr-chats"); }
+  if(tab==="profile"){ showScreen("scr-profile"); }
 }
 
 function randId(prefix="u"){
@@ -791,39 +725,43 @@ function setMsg(el, html, kind){
   el.innerHTML = html;
   el.classList.remove("hidden");
 }
-
 function clearMsg(el){
   el.classList.add("hidden");
   el.innerHTML = "";
-}
-
-function onlineText(u){
-  // online if lastSeen within 45s and online true
-  const ls = u.lastSeen || 0;
-  const on = !!u.online && (now() - ls) < 45000;
-  return on ? "онлайн" : "оффлайн";
 }
 
 function isOnline(u){
   const ls = u.lastSeen || 0;
   return !!u.online && (now() - ls) < 45000;
 }
+function onlineText(u){
+  return isOnline(u) ? "онлайн" : "оффлайн";
+}
 
 function chatIdFor(a,b){
   return [a,b].sort().join("_");
+}
+function escapeHtml(str){
+  return (str ?? "").toString()
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 }
 
 /* =========================
    State
 ========================= */
 let session = null; // { uid, login }
-let me = null;      // user doc data + id
-let usersCache = new Map(); // uid -> data
-let peer = null;    // {uid, data}
+let me = null;      // {uid, ...data}
+let usersCache = new Map(); // uid -> {uid,...}
+let peer = null;    // {uid,...}
 let currentChatId = null;
 
 let unsubMsgs = null;
 let unsubPeer = null;
+let unsubChatList = null;
 let heartbeatTimer = null;
 let typingTimer = null;
 let typingClearTimer = null;
@@ -859,7 +797,6 @@ function setAuthMode(mode){
 $("segLogin").addEventListener("click", ()=> setAuthMode("login"));
 $("segReg").addEventListener("click", ()=> setAuthMode("reg"));
 
-/* Default avatar */
 const defaultAvatar = "data:image/svg+xml;base64," + btoa(`
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256">
   <defs>
@@ -875,7 +812,6 @@ const defaultAvatar = "data:image/svg+xml;base64," + btoa(`
 `);
 $("regAvatarPreview").src = defaultAvatar;
 
-/* File -> base64 */
 function bindAvatarInput(fileEl, imgEl){
   fileEl.addEventListener("change", (e)=>{
     const f = e.target.files && e.target.files[0];
@@ -944,8 +880,6 @@ $("authBtn").addEventListener("click", async ()=>{
       session = { uid, login };
       saveSession(session);
       await afterLogin();
-
-      setMsg($("authMsg"), "Аккаунт создан ✅", "ok");
       return;
     }
 
@@ -980,7 +914,6 @@ async function setOnline(flag){
     }, { merge:true });
   }catch{}
 }
-
 function startHeartbeat(){
   stopHeartbeat();
   heartbeatTimer = setInterval(()=> setOnline(true), 15000);
@@ -988,10 +921,8 @@ function startHeartbeat(){
 function stopHeartbeat(){
   if(heartbeatTimer){ clearInterval(heartbeatTimer); heartbeatTimer=null; }
 }
-
 window.addEventListener("beforeunload", ()=> setOnline(false));
 document.addEventListener("visibilitychange", ()=>{
-  // when backgrounded, mark offline-ish (best effort)
   if(document.hidden) setOnline(false);
   else setOnline(true);
 });
@@ -1005,13 +936,10 @@ async function loadMe(){
   me = { uid: snap.id, ...snap.data() };
   usersCache.set(me.uid, me);
 }
-
 async function warmUsersCache(){
-  // for search we need users list
   const snap = await db.collection("users").get();
   usersCache.clear();
   snap.forEach(d => usersCache.set(d.id, { uid:d.id, ...d.data() }));
-  // ensure me is consistent
   if(session && usersCache.has(session.uid)) me = usersCache.get(session.uid);
 }
 
@@ -1025,6 +953,7 @@ async function afterLogin(){
   await warmUsersCache();
   await loadMe();
   renderProfile();
+  bindChatListRealtime();
   showScreen("scr-chats");
   setTab("chats");
 }
@@ -1048,13 +977,10 @@ $("saveProfileBtn").addEventListener("click", async ()=>{
 
   try{
     await db.collection("users").doc(me.uid).set({ nick, phone, avatar }, { merge:true });
-    // update local
     me.nick = nick; me.phone = phone; me.avatar = avatar;
     usersCache.set(me.uid, me);
     renderProfile();
     setMsg($("profileMsg"), "Сохранено ✅", "ok");
-    // refresh chat list visuals (avatars/nicks)
-    renderChatList();
   }catch(e){
     setMsg($("profileMsg"), "Ошибка: " + (e && e.message ? e.message : String(e)), "err");
   }
@@ -1072,6 +998,7 @@ async function logout(){
   stopHeartbeat();
   if(unsubMsgs) { unsubMsgs(); unsubMsgs=null; }
   if(unsubPeer) { unsubPeer(); unsubPeer=null; }
+  if(unsubChatList){ unsubChatList(); unsubChatList=null; }
   session = null; me = null; peer = null; currentChatId = null;
   clearSession();
   $("bottomNav").classList.add("hidden");
@@ -1080,98 +1007,80 @@ async function logout(){
 $("btnLogout").addEventListener("click", logout);
 $("btnLogout2").addEventListener("click", logout);
 
-/* =========================
-   Tabs (Chats/Profile)
-========================= */
+/* Tabs */
 document.querySelectorAll(".navItem").forEach(el=>{
   el.addEventListener("click", ()=>{
     const tab = el.getAttribute("data-tab");
     setTab(tab);
+    if(tab==="chats") showScreen("scr-chats");
+    if(tab==="profile") showScreen("scr-profile");
   });
 });
 
 /* =========================
-   Chats list
-   - чат появляется в списке после первого сообщения
+   Chats list (realtime)
+   чат появляется в списке после первого сообщения (lastTime>0)
 ========================= */
-let unsubChatList = null;
-
-function renderChatList(){
+function bindChatListRealtime(){
   if(!me) return;
-
-  // realtime list: chats where participants array-contains me
   if(unsubChatList){ unsubChatList(); unsubChatList=null; }
 
-  const q = db.collection("chats")
-    .where("participants", "array-contains", me.uid);
+  unsubChatList = db.collection("chats")
+    .where("participants", "array-contains", me.uid)
+    .onSnapshot(async (snap)=>{
+      await warmUsersCache();
 
-  unsubChatList = q.onSnapshot(async (snap)=>{
-    // ensure cache
-    await warmUsersCache();
+      let items=[];
+      snap.forEach(d=>{
+        const c=d.data();
+        if((c.lastTime||0) > 0){
+          items.push({ id:d.id, ...c });
+        }
+      });
+      items.sort((a,b)=>(b.lastTime||0)-(a.lastTime||0));
 
-    let items = [];
-    snap.forEach(d=>{
-      const c = d.data();
-      // only show if has lastTime (means at least one message)
-      if((c.lastTime || 0) > 0){
-        items.push({ id:d.id, ...c });
+      const box = $("chatList");
+      box.innerHTML = "";
+
+      if(items.length===0){
+        const div=document.createElement("div");
+        div.style.padding="10px 16px";
+        div.style.color="rgba(234,241,255,.55)";
+        div.style.fontWeight="1000";
+        div.textContent="Пока нет чатов. Нажми поиск и напиши кому-нибудь.";
+        box.appendChild(div);
+        return;
       }
+
+      for(const c of items){
+        const peerId = (c.participants||[]).find(x=>x!==me.uid);
+        const u = usersCache.get(peerId) || { nick:"Кто-то", avatar: defaultAvatar };
+
+        const row=document.createElement("div");
+        row.className="chatRow";
+        row.innerHTML=`
+          <img class="avatar" src="${u.avatar || defaultAvatar}" alt="">
+          <div class="meta">
+            <div class="nameLine">
+              <div class="name">${escapeHtml(u.nick || "Кто-то")}</div>
+              <div class="time">${c.lastTime ? fmtTime(c.lastTime) : ""}</div>
+            </div>
+            <div class="preview">
+              <div class="snippet">${escapeHtml(c.lastText || "")}</div>
+            </div>
+          </div>
+        `;
+        row.addEventListener("click", ()=> openChat(peerId));
+        box.appendChild(row);
+      }
+    }, (err)=>{
+      $("chatList").innerHTML = `<div class="err" style="margin:10px;">Ошибка чтения чатов: ${escapeHtml(err.message||String(err))}</div>`;
     });
-
-    items.sort((a,b)=> (b.lastTime||0) - (a.lastTime||0));
-
-    const box = $("chatList");
-    box.innerHTML = "";
-
-    if(items.length === 0){
-      const div = document.createElement("div");
-      div.style.padding = "10px 16px";
-      div.style.color = "rgba(234,241,255,.55)";
-      div.style.fontWeight = "1000";
-      div.textContent = "Пока нет чатов. Нажми поиск и напиши кому-нибудь.";
-      box.appendChild(div);
-      return;
-    }
-
-    for(const c of items){
-      const peerId = (c.participants || []).find(x=>x !== me.uid);
-      const u = usersCache.get(peerId) || { nick:"Кто-то", avatar: defaultAvatar, online:false, lastSeen:0 };
-
-      const row = document.createElement("div");
-      row.className = "chatRow";
-      row.innerHTML = `
-        <img class="avatar" src="${u.avatar || defaultAvatar}" alt="">
-        <div class="meta">
-          <div class="nameLine">
-            <div class="name">${escapeHtml(u.nick || "Кто-то")}</div>
-            <div class="time">${c.lastTime ? fmtTime(c.lastTime) : ""}</div>
-          </div>
-          <div class="preview">
-            <div class="snippet">${escapeHtml(c.lastText || "")}</div>
-          </div>
-        </div>
-      `;
-      row.addEventListener("click", ()=> openChat(peerId));
-      box.appendChild(row);
-    }
-  }, (err)=>{
-    $("chatList").innerHTML = `<div class="err" style="margin:10px;">Ошибка чтения чатов: ${escapeHtml(err.message||String(err))}</div>`;
-  });
-}
-
-function escapeHtml(str){
-  return (str ?? "").toString()
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
 }
 
 /* =========================
-   Search screen
-   - отдельное окно поиска
-   - показывает: аву, ник, онлайн/оффлайн
+   Search (отдельный экран)
+   исключаем себя (uid + login)
 ========================= */
 $("openSearch").addEventListener("click", async ()=>{
   await warmUsersCache();
@@ -1181,11 +1090,7 @@ $("openSearch").addEventListener("click", async ()=>{
   showScreen("scr-search");
   $("searchInput").focus();
 });
-
-$("cancelSearch").addEventListener("click", ()=>{
-  showScreen("scr-chats");
-});
-
+$("cancelSearch").addEventListener("click", ()=> showScreen("scr-chats"));
 $("clearSearch").addEventListener("click", ()=>{
   $("searchInput").value = "";
   $("searchResults").innerHTML = "";
@@ -1203,16 +1108,16 @@ $("searchInput").addEventListener("input", ()=>{
     return;
   }
 
-  let found = [];
+  let found=[];
   for(const [uid,u] of usersCache.entries()){
+    if(!me) continue;
     if(uid === me.uid) continue;
-    const nick = (u.nick || "").toLowerCase();
-    if(nick.includes(q)){
-      found.push(u);
-    }
+    if((u.login||"") === (me.login||"")) continue;
+
+    const nick = (u.nick||"").toLowerCase();
+    if(nick.includes(q)) found.push(u);
   }
 
-  // sort: online first, then by nick
   found.sort((a,b)=>{
     const ao = isOnline(a) ? 1 : 0;
     const bo = isOnline(b) ? 1 : 0;
@@ -1223,9 +1128,9 @@ $("searchInput").addEventListener("input", ()=>{
   $("searchEmpty").textContent = found.length ? "" : "Никого не найдено";
 
   for(const u of found.slice(0, 40)){
-    const row = document.createElement("div");
-    row.className = "userRow";
-    row.innerHTML = `
+    const row=document.createElement("div");
+    row.className="userRow";
+    row.innerHTML=`
       <img class="avatar" src="${u.avatar || defaultAvatar}" alt="">
       <div class="meta">
         <div class="nameLine" style="justify-content:flex-start;">
@@ -1235,65 +1140,59 @@ $("searchInput").addEventListener("input", ()=>{
         <div class="sub">${isOnline(u) ? "онлайн" : "оффлайн"}</div>
       </div>
     `;
-    row.addEventListener("click", ()=>{
-      // открываем чат, но в списке чатов он появится только если ты отправишь сообщение
-      openChat(u.uid);
-    });
+    row.addEventListener("click", ()=> openChat(u.uid));
     box.appendChild(row);
   }
 });
 
 /* =========================
-   Chat screen
-   - header: ава, ник, статус
-   - кнопка выйти из чата (вернуться в Чаты)
-   - "Печатает…" если peer typing
+   Chat
+   - header status: онлайн/оффлайн или "Печатает…"
 ========================= */
 function stopPeerWatch(){
   if(unsubPeer){ unsubPeer(); unsubPeer=null; }
 }
+async function clearMyTyping(){
+  if(!session) return;
+  try{
+    await db.collection("users").doc(me.uid).set({ typingTo:"", typingAt:0 }, { merge:true });
+  }catch{}
+}
+async function setMyTyping(){
+  if(!peer || !session) return;
+  try{
+    await db.collection("users").doc(me.uid).set({ typingTo: peer.uid, typingAt: now() }, { merge:true });
+  }catch{}
+}
 
 async function openChat(peerId){
   await warmUsersCache();
-
   peer = usersCache.get(peerId) || null;
   if(!peer){ alert("Пользователь не найден"); return; }
 
   currentChatId = chatIdFor(me.uid, peerId);
 
-  // header
   $("peerAvatar").src = peer.avatar || defaultAvatar;
   $("peerNick").textContent = peer.nick || "Кто-то";
   $("peerStatus").textContent = onlineText(peer);
 
-  // watch peer (online + typing)
   stopPeerWatch();
   unsubPeer = db.collection("users").doc(peerId).onSnapshot((snap)=>{
     if(!snap.exists) return;
     peer = { uid: snap.id, ...snap.data() };
     usersCache.set(peer.uid, peer);
 
-    // typing logic (valid if typingAt within 4s and typingTo == me)
     const typing = (peer.typingTo === me.uid) && ((now() - (peer.typingAt||0)) < 4000);
-    if(typing){
-      $("peerStatus").textContent = "Печатает…";
-    }else{
-      $("peerStatus").textContent = onlineText(peer);
-    }
+    $("peerStatus").textContent = typing ? "Печатает…" : onlineText(peer);
   });
 
-  // ensure chat doc exists (but keep lastTime=0 until first message)
+  // ensure chat doc exists (не показываем в списке, пока не будет first message)
   const chatRef = db.collection("chats").doc(currentChatId);
   const chatSnap = await chatRef.get();
   if(!chatSnap.exists){
-    await chatRef.set({
-      participants: [me.uid, peerId],
-      lastText: "",
-      lastTime: 0
-    });
+    await chatRef.set({ participants:[me.uid, peerId], lastText:"", lastTime:0 });
   }
 
-  // subscribe messages
   if(unsubMsgs){ unsubMsgs(); unsubMsgs=null; }
   unsubMsgs = chatRef.collection("messages").orderBy("time").onSnapshot((ss)=>{
     const box = $("msgList");
@@ -1312,21 +1211,16 @@ async function openChat(peerId){
     box.scrollTop = box.scrollHeight;
   });
 
-  // go to chat
+  $("msgInput").value = "";
+  await clearMyTyping();
   showScreen("scr-chat");
-
-  // clear typing state when entering
-  clearMyTyping();
+  $("msgInput").focus();
 }
 
 function closeChat(){
-  // clear typing
   clearMyTyping();
-  // return to chats
   showScreen("scr-chats");
-  // list is realtime anyway
 }
-
 $("backToChats").addEventListener("click", closeChat);
 $("exitChat").addEventListener("click", closeChat);
 
@@ -1337,67 +1231,34 @@ async function sendMessage(){
 
   const chatRef = db.collection("chats").doc(currentChatId);
 
-  // write message
   await chatRef.collection("messages").add({
     text,
     sender: me.uid,
     time: now()
   });
 
-  // update chat last
   await chatRef.set({
     participants: [me.uid, peer.uid],
     lastText: text,
     lastTime: now()
   }, { merge:true });
 
-  // after first message chat becomes visible in chat list (because lastTime > 0)
-
-  // stop typing quickly
-  clearMyTyping();
+  await clearMyTyping();
 }
 
 $("sendBtn").addEventListener("click", sendMessage);
 $("msgInput").addEventListener("keydown", (e)=>{
   if(e.key === "Enter") sendMessage();
 });
-
-/* =========================
-   Typing: "Печатает…"
-   - when I type: set my typingTo=peer, typingAt=now
-   - clear after 1.2s no input
-========================= */
-async function setMyTyping(){
-  if(!peer || !session) return;
-  try{
-    await db.collection("users").doc(me.uid).set({
-      typingTo: peer.uid,
-      typingAt: now()
-    }, { merge:true });
-  }catch{}
-}
-async function clearMyTyping(){
-  if(!session) return;
-  try{
-    await db.collection("users").doc(me.uid).set({
-      typingTo: "",
-      typingAt: 0
-    }, { merge:true });
-  }catch{}
-}
-
 $("msgInput").addEventListener("input", ()=>{
   if(!peer) return;
 
-  // throttle bursts
   if(!typingTimer){
     typingTimer = setTimeout(async ()=>{
       typingTimer = null;
       await setMyTyping();
     }, 150);
   }
-
-  // clear after idle
   if(typingClearTimer) clearTimeout(typingClearTimer);
   typingClearTimer = setTimeout(()=> clearMyTyping(), 1200);
 });
@@ -1406,7 +1267,6 @@ $("msgInput").addEventListener("input", ()=>{
    Boot
 ========================= */
 (async ()=>{
-  // restore session
   const s = loadSession();
   if(s && s.uid){
     session = s;
