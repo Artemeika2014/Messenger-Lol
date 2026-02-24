@@ -1,0 +1,3881 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>LOL Messenger ULTRA</title>
+  
+  <!-- Иконки для iOS / PWA - ТВОЙ ЛОГОТИП (по ссылке) -->
+  <link rel="apple-touch-icon" sizes="180x180" href="https://iili.io/qdLcM6N.md.jpg">
+  <link rel="apple-touch-icon" sizes="152x152" href="https://iili.io/qdLcM6N.md.jpg">
+  <link rel="apple-touch-icon" sizes="167x167" href="https://iili.io/qdLcM6N.md.jpg">
+  <link rel="apple-touch-icon" sizes="120x120" href="https://iili.io/qdLcM6N.md.jpg">
+
+  <style>
+    :root{
+      --bg:#070a10;
+      --panel:rgba(18,24,38,.72);
+      --panel2:rgba(10,14,22,.88);
+      --line:rgba(255,255,255,.08);
+      --text:#eaf1ff;
+      --muted:rgba(234,241,255,.62);
+      --muted2:rgba(234,241,255,.40);
+      --blue:#2b86ff;
+      --blue2:#1f6bff;
+      --ok:#22c55e;
+      --red:#ef4444;
+      --shadow:0 18px 45px rgba(0,0,0,.45);
+
+      --tabbar-h:82px;
+      --composer-h:72px;
+      
+      /* Liquid Tabbar переменные */
+      --bar: rgba(70,70,72,.86);
+      --idle-pill: rgba(255,255,255,.12);
+      --water: rgba(255,255,255,.02);
+      --active: #007AFF;
+      --inactive: #000;
+      --pad: 7px;
+      --pillH: 60px;
+    }
+
+    *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(900px 600px at 15% -10%, rgba(43,134,255,.22), transparent 60%),
+        radial-gradient(850px 550px at 85% 0%, rgba(168,85,247,.18), transparent 58%),
+        radial-gradient(900px 700px at 60% 110%, rgba(34,197,94,.10), transparent 55%),
+        var(--bg);
+      overflow:hidden;
+    }
+
+    .app{ height:100%; display:flex; flex-direction:column; }
+    .screen{ display:none; height:100%; overflow-y:auto; overflow-x:hidden; }
+    .screen.active{ display:block; }
+
+    .glass{
+      background:var(--panel);
+      border:1px solid var(--line);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .topbar{
+      padding:14px 16px 10px;
+      padding-top:max(14px, env(safe-area-inset-top));
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .topbar h1{
+      margin:0;
+      font-size:28px;
+      font-weight:1000;
+      letter-spacing:.2px;
+    }
+
+    .iconbtn{
+      width:40px; height:40px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      display:grid; place-items:center;
+      cursor:pointer;
+    }
+
+    .btn{
+      width:100%;
+      padding:12px 14px;
+      border:none;
+      border-radius:16px;
+      font-weight:1000;
+      color:white;
+      background: linear-gradient(180deg, var(--blue), var(--blue2));
+      cursor:pointer;
+    }
+    .btn.ghost{
+      background: rgba(255,255,255,.06);
+      border:1px solid var(--line);
+      color:var(--text);
+    }
+
+    .field{
+      background: rgba(255,255,255,.06);
+      border:1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px 12px;
+      margin-bottom:10px;
+    }
+    .field label{
+      display:block;
+      font-size:12px;
+      color:var(--muted2);
+      font-weight:1000;
+      margin-bottom:6px;
+      text-transform:uppercase;
+      letter-spacing:.4px;
+    }
+    .field input{
+      width:100%;
+      border:none; outline:none;
+      background:transparent;
+      color:var(--text);
+      font-size:16px;
+      font-weight:1000;
+    }
+
+    .hint{ color:var(--muted); font-weight:900; font-size:13px; }
+    .err{ color:#fecaca; background: rgba(239,68,68,.14); border: 1px solid rgba(239,68,68,.25); padding:10px 12px; border-radius:16px; font-weight:1000; }
+    .ok{  color:#bbf7d0; background: rgba(34,197,94,.12); border: 1px solid rgba(34,197,94,.22); padding:10px 12px; border-radius:16px; font-weight:1000; }
+    .hidden{ display:none !important; }
+
+    /* ---------- AUTH ---------- */
+    #scr-auth{
+      padding: 18px 14px;
+      padding-top: max(18px, env(safe-area-inset-top));
+      padding-bottom: max(18px, env(safe-area-inset-bottom));
+      overflow:auto;
+    }
+    .brand{
+      font-size:34px;
+      font-weight:1100;
+      letter-spacing:.2px;
+      margin: 8px 6px 2px;
+      background: linear-gradient(90deg, #60a5fa, #a78bfa, #22c55e);
+      -webkit-background-clip:text;
+      color:transparent;
+    }
+    .subtitle{
+      margin: 0 6px 16px;
+      color: var(--muted);
+      font-weight:1000;
+    }
+    .authCard{
+      border-radius: 22px;
+      padding: 16px 14px;
+    }
+    .seg{
+      display:flex;
+      gap:8px;
+      margin-bottom:12px;
+    }
+    .seg button{
+      flex:1;
+      border:none;
+      border-radius: 16px;
+      padding: 10px 12px;
+      font-weight:1100;
+      cursor:pointer;
+      background: rgba(255,255,255,.06);
+      border:1px solid var(--line);
+      color: var(--muted);
+    }
+    .seg button.active{
+      background: rgba(43,134,255,.22);
+      border:1px solid rgba(43,134,255,.35);
+      color: var(--text);
+    }
+
+    .avatarPick{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:10px;
+    }
+    .avatar{
+      width:54px; height:54px;
+      border-radius:50%;
+      object-fit:cover;
+      background: rgba(255,255,255,.08);
+      border:1px solid var(--line);
+      flex:0 0 auto;
+    }
+    .avatar.big{ width:78px; height:78px; }
+    .avatar.med{ width:72px; height:72px; }
+
+    /* ===== НОВЫЙ LIQUID TABBAR (2 вкладки) ===== */
+    .nav{
+      position:fixed;
+      left:0; right:0; bottom:0;
+      height: var(--tabbar-h);
+      padding-bottom: max(10px, env(safe-area-inset-bottom));
+      background: transparent;
+      border-top: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .tabbar{
+      position:relative;
+      width:320px;
+      height:74px;
+      border-radius:999px;
+      background: var(--bar);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 18px 40px rgba(0,0,0,.65);
+      display:grid;
+      grid-template-columns: repeat(2, 1fr);
+      align-items:center;
+      padding: var(--pad);
+      user-select:none;
+      -webkit-tap-highlight-color:transparent;
+      pointer-events: auto;
+      margin-bottom: 8px;
+    }
+
+    /* ===== PILL ===== */
+    .pill{
+      position:absolute;
+      left: var(--pad);
+      top: 50%;
+      transform: translateX(var(--x, 0px)) translateY(-50%) scale(1);
+
+      width: calc((100% - (var(--pad) * 2)) / 2);
+      height: var(--pillH);
+      border-radius:999px;
+
+      background: var(--idle-pill);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+
+      transition:
+        transform .42s cubic-bezier(.16, 1, .3, 1),
+        background-color .18s ease,
+        box-shadow .18s ease,
+        border-radius .35s cubic-bezier(.2,.9,.2,1);
+
+      z-index:1;
+      pointer-events:none;
+    }
+
+    /* ===== WATER MODE ===== */
+    .tabbar.is-water .pill{
+      background: var(--water);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+
+      transform:
+        translateX(var(--x, 0px))
+        translateY(-50%)
+        scaleX(1.14)
+        scaleY(1.18);
+
+      box-shadow:
+        0 12px 26px rgba(0,0,0,.38),
+        0 0 0 1px rgba(255,255,255,.05),
+        0 0 22px rgba(140,220,255,.26);
+
+      border-radius: 34px;
+    }
+
+    /* ===== TAB ===== */
+    .tab{
+      position:relative;
+      z-index:2;
+      height: var(--pillH);
+      border:0;
+      background:transparent;
+      cursor:pointer;
+
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+
+      color: var(--inactive);
+      transition: color .18s ease;
+    }
+
+    .tab .icon{ font-size:22px; }
+    .tab .label{ font-size:12px; font-weight:500; }
+
+    .tab.active{ color: var(--active); }
+    .tabbar.is-water .tab.is-hovered{ color: var(--active); }
+
+    /* ---------- CHATS LIST ---------- */
+    #scr-chats{ overflow:hidden; }
+    .searchpill{
+      margin: 0 16px 10px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.06);
+      border:1px solid var(--line);
+      padding: 12px 12px;
+      display:flex; align-items:center; gap:10px;
+      cursor:pointer;
+      font-weight:1000;
+      color: var(--muted);
+    }
+    .banner{
+      margin: 12px 16px;
+      border-radius: 18px;
+      padding: 16px 14px;
+      background: linear-gradient(135deg, #7c3aed 0%, #2563eb 55%, #0ea5e9 100%);
+      box-shadow: var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .banner::after{
+      content:"";
+      position:absolute; right:-60px; top:-60px;
+      width:220px; height:220px;
+      border-radius:50%;
+      background: rgba(255,255,255,.18);
+    }
+    .bannerTitle{ margin:0; font-weight:1100; font-size:18px; }
+    .bannerText{ margin:6px 0 0; font-weight:1000; opacity:.9; }
+
+    .list{
+      padding: 0 10px calc(var(--tabbar-h) + 16px + env(safe-area-inset-bottom));
+      height: calc(100% - 176px);
+      overflow:auto;
+    }
+    .row{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      padding: 12px 8px;
+      border-radius: 18px;
+      cursor:pointer;
+    }
+    .row:active{ background: rgba(255,255,255,.05); }
+    .meta{ flex:1; min-width:0; }
+    .nameLine{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .name{
+      font-size:16px;
+      font-weight:1100;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .time{ color:var(--muted2); font-weight:1100; font-size:12px; }
+    .preview{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:4px; }
+    .snippet{
+      color:var(--muted);
+      font-weight:1000;
+      font-size:14px;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      min-width:0; flex:1;
+    }
+
+    /* ---------- SEARCH SCREEN ---------- */
+    #scr-search{ overflow:hidden; }
+    .searchTop{
+      padding: 14px 16px 10px;
+      padding-top:max(14px, env(safe-area-inset-top));
+      display:flex; gap:10px; align-items:center;
+    }
+    .searchField{
+      flex:1;
+      display:flex; align-items:center; gap:10px;
+      background: rgba(255,255,255,.06);
+      border:1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px 12px;
+      font-weight:1100;
+    }
+    .searchField input{
+      flex:1;
+      border:none; outline:none;
+      background:transparent;
+      color: var(--text);
+      font-size:16px;
+      font-weight:1100;
+      min-width:0;
+    }
+    .cancel{
+      font-weight:1100;
+      color:var(--text);
+      opacity:.9;
+      cursor:pointer;
+      user-select:none;
+    }
+    .sectionTitle{
+      padding: 10px 16px 6px;
+      color: var(--muted2);
+      font-weight:1100;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+      font-size:12px;
+    }
+    .searchList{
+      padding: 0 10px calc(var(--tabbar-h) + 16px + env(safe-area-inset-bottom));
+      height: calc(100% - 58px);
+      overflow:auto;
+    }
+    .statusDot{
+      width:10px; height:10px;
+      border-radius:50%;
+      background: rgba(255,255,255,.25);
+      border:1px solid rgba(255,255,255,.18);
+      flex:0 0 auto;
+    }
+    .statusDot.on{
+      background: var(--ok);
+      border-color: rgba(34,197,94,.35);
+    }
+    .sub{ color: var(--muted2); font-weight:1000; font-size:12px; margin-top:2px; }
+
+    /* ---------- CHAT SCREEN ---------- */
+    #scr-chat{ overflow:hidden; }
+    .chatWrap{
+      height:100%;
+      display:flex;
+      flex-direction:column;
+      background:
+        radial-gradient(900px 620px at 10% 10%, rgba(43,134,255,.18), transparent 60%),
+        radial-gradient(900px 650px at 90% 30%, rgba(168,85,247,.14), transparent 58%),
+        radial-gradient(900px 650px at 50% 110%, rgba(34,197,94,.08), transparent 55%),
+        #070a10;
+    }
+    .chatTop{
+      padding: 12px 12px 10px;
+      padding-top:max(12px, env(safe-area-inset-top));
+      display:flex;
+      align-items:center;
+      gap:10px;
+      background: rgba(10,14,22,.82);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .backBtn{
+      width:40px; height:40px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      display:grid; place-items:center;
+      cursor:pointer;
+      font-weight:1100;
+      color:var(--text);
+    }
+    .chatHead{ flex:1; min-width:0; display:flex; gap:10px; align-items:center; }
+    .chatMeta{ min-width:0; }
+    .chatName{
+      font-weight:1100;
+      font-size:16px;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .chatStatus{
+      color: var(--muted2);
+      font-weight:1100;
+      font-size:12px;
+      margin-top:2px;
+    }
+
+    .msgs{
+      flex:1;
+      overflow:auto;
+      padding: 14px 12px calc(var(--tabbar-h) + var(--composer-h) + 16px + env(safe-area-inset-bottom));
+    }
+
+    .bubble{
+      max-width: 78%;
+      padding: 10px 12px;
+      margin: 6px 0;
+      border-radius: 18px;
+      background: rgba(255,255,255,.07);
+      border:1px solid var(--line);
+      box-shadow: 0 14px 26px rgba(0,0,0,.22);
+      font-weight:1000;
+      white-space:pre-wrap;
+      word-break:break-word;
+      position: relative;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .bubble.me{
+      margin-left:auto;
+      border:none;
+      background: linear-gradient(135deg, rgba(43,134,255,.98), rgba(168,85,247,.92));
+    }
+    .bubble .t{
+      display:block;
+      margin-top:6px;
+      font-size:11px;
+      color: rgba(255,255,255,.75);
+      font-weight:1100;
+      text-align:right;
+    }
+    .bubble.deleted {
+      opacity: 0.5;
+      font-style: italic;
+      background: rgba(255,255,255,.03);
+    }
+
+    /* Статусы сообщений - белые галочки в левом нижнем углу */
+    .message-status {
+      display: inline-block;
+      margin-left: 4px;
+      font-size: 14px;
+      color: rgba(255,255,255,0.9);
+      vertical-align: middle;
+    }
+    
+    .bubble .message-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      margin-top: 6px;
+      gap: 4px;
+    }
+    
+    .status-delivered {
+      color: rgba(255,255,255,0.9);
+    }
+    
+    .status-read {
+      color: rgba(255,255,255,0.9);
+    }
+    
+    /* Кнопка блокировки */
+    .block-btn {
+      width:40px; height:40px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      display:grid; place-items:center;
+      cursor:pointer;
+      font-weight:1100;
+      color:var(--text);
+      margin-left: 8px;
+    }
+    
+    .block-btn.blocked {
+      background: rgba(239,68,68,.2);
+      border-color: #ef4444;
+      color: #ef4444;
+    }
+
+    /* ---------- НОВЫЕ КНОПКИ ДЛЯ СОЗДАТЕЛЯ ---------- */
+    .chat-actions {
+      display: flex;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    .action-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .creator-action-btn {
+      border: 2px solid #2b86ff;
+      background: rgba(43,134,255,0.15);
+      color: #2b86ff;
+    }
+
+    /* Модалка */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+
+    .modal.hidden {
+      display: none;
+    }
+
+    .modal-content {
+      background: var(--panel2);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 24px;
+      width: 90%;
+      max-width: 340px;
+    }
+
+    .modal-content h3 {
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .modal-content input, .modal-content select {
+      width: 100%;
+      padding: 12px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .modal-btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 1100;
+      cursor: pointer;
+    }
+
+    .modal-btn.confirm {
+      background: var(--blue);
+      color: white;
+    }
+
+    .modal-btn.cancel {
+      background: rgba(255,255,255,.1);
+      color: var(--text);
+    }
+
+    /* ---------- COMPOSER ---------- */
+    .composer{
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+      padding: 10px;
+      background: rgba(10,14,22,.95);
+      border-top: 1px solid var(--line);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display:flex;
+      gap:8px;
+      align-items:center;
+      z-index: 999;
+    }
+    .composerInput{
+      flex:1;
+      display:flex; align-items:center; gap:10px;
+      background: rgba(255,255,255,.06);
+      border:1px solid var(--line);
+      border-radius: 18px;
+      padding: 10px 12px;
+      min-width:0;
+    }
+    .composerInput input{
+      flex:1;
+      border:none; outline:none;
+      background:transparent;
+      color: var(--text);
+      font-size:16px;
+      font-weight:1100;
+      min-width:0;
+    }
+    .composerInput select {
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: var(--text);
+      padding: 8px;
+    }
+    .sendBtn{
+      width:46px; height:46px;
+      border-radius: 18px;
+      border:none;
+      background: linear-gradient(180deg, var(--blue), var(--blue2));
+      color:white;
+      font-weight:1100;
+      cursor:pointer;
+      flex:0 0 auto;
+      user-select:none;
+    }
+    .sendBtn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* ---------- PROFILE SCREEN ---------- */
+    #scr-profile{ overflow:auto; padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)); }
+    .profilePad{
+      padding: 14px 14px;
+      padding-top:max(14px, env(safe-area-inset-top));
+    }
+    .profileCard{
+      border-radius: 22px;
+      padding: 16px 14px;
+      margin-bottom: 16px;
+    }
+    .profileHead{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .pName{ margin:0; font-size:22px; font-weight:1100; }
+    .pSub{ margin-top:4px; color:var(--muted); font-weight:1100; font-size:13px; }
+
+    /* ---------- BALANCE SCREEN ---------- */
+    #scr-balance {
+      overflow: auto;
+      padding: 20px;
+      padding-top: max(20px, env(safe-area-inset-top));
+      padding-bottom: max(20px, env(safe-area-inset-bottom));
+      height: 100%;
+    }
+    
+    .balance-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 24px;
+      gap: 16px;
+    }
+    
+    .balance-back {
+      width: 44px;
+      height: 44px;
+      border-radius: 22px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    
+    .balance-title {
+      font-size: 32px;
+      font-weight: 1000;
+      margin: 0;
+      background: linear-gradient(135deg, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .balance-card {
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 24px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    
+    .balance-amount {
+      font-size: 48px;
+      font-weight: 1000;
+      color: var(--blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .balance-amount span {
+      font-size: 40px;
+    }
+    
+    .shop-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 24px 0;
+    }
+    
+    .shop-item {
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
+    
+    .shop-item-price {
+      color: var(--blue);
+      font-weight: 1100;
+      font-size: 20px;
+      margin: 10px 0;
+    }
+    
+    .shop-item-badge {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+    
+    .shop-item-badge img {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+    
+    .shop-item-expired {
+      color: var(--red);
+      font-size: 12px;
+      margin-top: 8px;
+    }
+    
+    .shop-item-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+    
+    .shop-item-actions button {
+      padding: 6px 12px;
+      font-size: 14px;
+    }
+    
+    .promo-section {
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    
+    .promo-stats {
+      margin-top: 20px;
+      font-size: 14px;
+    }
+    
+    .promo-stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    
+    .status-selector {
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    
+    /* Стили для селекта с картинками */
+    .status-selector select {
+      width: 100%;
+      padding: 12px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: var(--text);
+    }
+    
+    .status-selector option {
+      background: var(--panel2);
+      color: var(--text);
+      padding: 8px;
+    }
+    
+    .status-selector option img {
+      vertical-align: middle;
+      margin-right: 8px;
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+    }
+    
+    /* Секция продажи статусов */
+    .sell-section {
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    
+    .sell-item {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+      cursor: pointer;
+    }
+    
+    .sell-item:hover {
+      background: rgba(255,255,255,.02);
+    }
+    
+    .sell-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-right: 12px;
+      accent-color: var(--blue);
+    }
+    
+    .sell-item label {
+      flex: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .sell-item-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      object-fit: cover;
+    }
+    
+    .sell-total {
+      text-align: right;
+      padding: 16px 0;
+      font-weight: 1100;
+      color: var(--blue);
+    }
+    
+    .sell-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--blue);
+      border: none;
+      border-radius: 16px;
+      color: white;
+      font-weight: 1100;
+      cursor: pointer;
+    }
+    
+    .sell-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* ---------- ABOUT SCREEN ---------- */
+    #scr-about {
+      overflow: auto;
+      padding: 20px;
+      padding-top: max(20px, env(safe-area-inset-top));
+      padding-bottom: max(20px, env(safe-area-inset-bottom));
+      height: 100%;
+    }
+    
+    .about-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 24px;
+      gap: 16px;
+    }
+    
+    .about-back {
+      width: 44px;
+      height: 44px;
+      border-radius: 22px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    
+    .about-title {
+      font-size: 32px;
+      font-weight: 1000;
+      margin: 0;
+      background: linear-gradient(135deg, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 24px 0;
+    }
+    
+    .feature-card {
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 20px 16px;
+      backdrop-filter: blur(10px);
+    }
+    
+    .feature-icon {
+      font-size: 36px;
+      margin-bottom: 12px;
+    }
+    
+    .feature-name {
+      font-weight: 1100;
+      font-size: 18px;
+      margin-bottom: 8px;
+      color: var(--blue);
+    }
+    
+    .feature-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+      font-weight: 1000;
+    }
+    
+    .tech-badge {
+      background: rgba(43,134,255,.15);
+      border: 1px solid rgba(43,134,255,.3);
+      border-radius: 100px;
+      padding: 6px 16px;
+      display: inline-block;
+      font-size: 14px;
+      font-weight: 1100;
+      margin: 4px;
+    }
+    
+    .about-footer {
+      margin-top: 32px;
+      text-align: center;
+      color: var(--muted2);
+      font-size: 14px;
+      font-weight: 1000;
+      padding: 20px 0;
+      border-top: 1px solid var(--line);
+    }
+
+  </style>
+</head>
+
+<body>
+<div class="app">
+
+  <!-- AUTH -->
+  <section id="scr-auth" class="screen active">
+    <div class="brand">LOL</div>
+    <div class="subtitle">Вход / Регистрация</div>
+
+    <div class="authCard glass">
+      <div class="seg">
+        <button id="segLogin" class="active" type="button">Вход</button>
+        <button id="segReg" type="button">Регистрация</button>
+      </div>
+
+      <div id="authMsg" class="hidden"></div>
+
+      <div class="field">
+        <label>Логин</label>
+        <input id="loginLogin" placeholder="например: l0l_user" autocomplete="username" />
+      </div>
+
+      <div class="field">
+        <label>Пароль</label>
+        <input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+
+      <div id="regExtra" class="hidden">
+        <div class="avatarPick">
+          <img id="regAvatarPreview" class="avatar med" alt="">
+          <div style="flex:1">
+            <div class="hint" style="font-weight:1100;margin-bottom:6px;">Аватар</div>
+            <input id="regAvatarFile" type="file" accept="image/*"
+              style="width:100%;padding:10px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--muted);" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Никнейм</label>
+          <input id="regNick" placeholder="как тебя будут видеть" autocomplete="nickname" />
+        </div>
+
+        <div class="field">
+          <label>Номер телефона</label>
+          <input id="regPhone" placeholder="+7 900 000-00-00" inputmode="tel" autocomplete="tel" />
+        </div>
+      </div>
+
+      <button id="authBtn" class="btn" type="button">Войти</button>
+
+      <div class="hint" style="margin-top:10px;">
+        * Это вход по логину/паролю без Firebase Auth (пароль хранится как SHA-256 хэш).
+      </div>
+    </div>
+  </section>
+
+  <!-- CHATS -->
+  <section id="scr-chats" class="screen">
+    <div class="topbar">
+      <h1>Чаты</h1>
+      <button id="btnLogout" class="iconbtn" type="button" title="Выйти">⎋</button>
+    </div>
+
+    <div id="openSearch" class="searchpill">🔎 Поиск по никнейму</div>
+
+    <div class="banner">
+      <p class="bannerTitle">LOL Messenger</p>
+      <p class="bannerText">Статусы: одна ✔ - доставлено, две ✔✔ - прочитано</p>
+    </div>
+
+    <div id="chatList" class="list"></div>
+  </section>
+
+  <!-- SEARCH -->
+  <section id="scr-search" class="screen">
+    <div class="searchTop">
+      <div class="searchField">
+        🔎
+        <input id="searchInput" placeholder="Никнейм..." />
+        <button id="clearSearch" class="iconbtn" type="button" style="width:34px;height:34px;border-radius:14px;">✕</button>
+      </div>
+      <div id="cancelSearch" class="cancel">Отмена</div>
+    </div>
+
+    <div class="searchList">
+      <div class="sectionTitle">Результаты</div>
+      <div id="searchResults"></div>
+      <div id="searchEmpty" class="hint" style="padding:10px 16px; font-weight:1100;"></div>
+    </div>
+  </section>
+
+  <!-- CHAT -->
+  <section id="scr-chat" class="screen">
+    <div class="chatWrap">
+      <div class="chatTop">
+        <div id="backToChats" class="backBtn">‹</div>
+
+        <div class="chatHead">
+          <img id="peerAvatar" class="avatar" alt="">
+          <div class="chatMeta">
+            <div id="peerNick" class="chatName">Чат</div>
+            <div id="peerStatus" class="chatStatus">…</div>
+          </div>
+        </div>
+
+        <!-- Контейнер для кнопок -->
+        <div class="chat-actions" id="chatActions"></div>
+        
+        <button id="exitChat" class="iconbtn" type="button" title="Выйти из чата">⤬</button>
+      </div>
+
+      <div id="msgList" class="msgs"></div>
+    </div>
+
+    <!-- composer -->
+    <div class="composer" id="composer">
+      <div class="composerInput">
+        <input id="msgInput" placeholder="Сообщение" />
+        <button class="action-btn" id="giftBtn" style="width:auto; padding:0 10px;" onclick="showGiftModal()">🎁</button>
+        <button class="action-btn" id="creatorGiftBtn" style="width:auto; padding:0 10px; display:none;" onclick="showCreatorGiftModal()">🎁➕</button>
+      </div>
+      <button id="sendBtn" class="sendBtn" type="button" title="Отправить">➤</button>
+    </div>
+  </section>
+
+  <!-- PROFILE -->
+  <section id="scr-profile" class="screen">
+    <div class="profilePad">
+      <div class="topbar" style="padding:0 2px 10px; padding-top:0;">
+        <h1>Профиль</h1>
+        <button id="btnLogout2" class="iconbtn" type="button" title="Выйти">⎋</button>
+      </div>
+
+      <div class="profileCard glass">
+        <div class="profileHead">
+          <img id="meAvatar" class="avatar big" alt="">
+          <div style="flex:1; min-width:0;">
+            <h2 id="meNick" class="pName">…</h2>
+            <div id="mePhone" class="pSub">…</div>
+            <div id="meLogin" class="pSub" style="opacity:.85;"></div>
+          </div>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <!-- Кнопка баланса -->
+        <button id="balanceBtn" class="btn ghost" type="button">🤣 <span id="balanceDisplay">0</span> LOL</button>
+        <div style="height:10px"></div>
+
+        <div class="avatarPick" style="margin:0 0 10px;">
+          <img id="editAvatarPreview" class="avatar med" alt="">
+          <div style="flex:1">
+            <div class="hint" style="font-weight:1100;margin-bottom:6px;">Сменить аватар</div>
+            <input id="editAvatarFile" type="file" accept="image/*"
+              style="width:100%;padding:10px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--muted);" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Никнейм</label>
+          <input id="editNick" />
+        </div>
+
+        <div class="field">
+          <label>Номер телефона</label>
+          <input id="editPhone" />
+        </div>
+
+        <button id="saveProfileBtn" class="btn" type="button">Сохранить</button>
+        <div style="height:10px"></div>
+        
+        <!-- Новая кнопка "Что за мессенджер?" -->
+        <button id="aboutBtn" class="btn ghost" type="button">❓ Что за мессенджер?</button>
+        <div style="height:10px"></div>
+        
+        <!-- НОВОЕ: Кнопка стать/убрать создателя -->
+        <button id="creatorBtn" class="btn ghost hidden" type="button">🔨 Стать создателем</button>
+        <div style="height:10px"></div>
+        
+        <button id="resetDeviceBtn" class="btn ghost" type="button">Сбросить устройство</button>
+
+        <div id="profileMsg" class="hidden" style="margin-top:10px;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BALANCE SCREEN -->
+  <section id="scr-balance" class="screen">
+    <div class="balance-header">
+      <div class="balance-back" id="balanceBackBtn">←</div>
+      <h2 class="balance-title">LOL Коин</h2>
+    </div>
+
+    <!-- Магазин -->
+    <div class="balance-card">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+        <h3>🛒 Магазин</h3>
+        <button id="addItemBtn" class="btn ghost" style="width:auto; padding:8px 16px; display:none;" onclick="showAddItemModal()">➕ Добавить статус</button>
+      </div>
+      
+      <div id="shopItems" class="shop-grid">
+        <!-- Сюда будут загружаться статусы из БД -->
+      </div>
+    </div>
+
+    <!-- Баланс -->
+    <div class="balance-card">
+      <div style="display:flex; align-items:center; justify-content:center; gap:20px;">
+        <span class="balance-amount"><span>🤣</span> <span id="balanceAmount">0</span></span>
+        <button id="addBalanceBtn" class="btn ghost" style="width:auto; padding:10px 20px; display:none;">➕</button>
+      </div>
+    </div>
+
+    <!-- Промокоды -->
+    <div class="promo-section">
+      <h3 style="margin-bottom:20px;">🎫 Промокод</h3>
+      <div style="display:flex; gap:10px;">
+        <input type="text" id="promoCode" placeholder="Введите промокод" style="flex:1;">
+        <button class="btn ghost" onclick="activatePromo()" style="width:auto;">Активировать</button>
+      </div>
+      
+      <!-- Для создателя: создание промокода -->
+      <div id="creatorPromoSection" style="margin-top:20px; display:none;">
+        <button class="btn ghost" onclick="showCreatePromoModal()">➕ Создать промо</button>
+        
+        <!-- Статистика промокодов -->
+        <div class="promo-stats" id="promoStats">
+          <h4>Статистика промокодов</h4>
+          <div id="promoStatsList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Продажа статусов -->
+    <div class="sell-section" id="sellSection">
+      <h3 style="margin-bottom:20px;">💰 Продать статус</h3>
+      <div id="sellItems">
+        <!-- Сюда будут загружаться статусы пользователя -->
+      </div>
+      
+      <div id="sellTotal" class="sell-total">
+        Выбрано: 0 статусов на сумму 0 🤣
+      </div>
+      
+      <button class="sell-btn" id="sellBtn" onclick="sellSelected()" disabled>
+        ПРОДАТЬ
+      </button>
+    </div>
+
+    <!-- Выбор статуса для отображения -->
+    <div class="status-selector">
+      <h3 style="margin-bottom:20px;">✨ Выбрать статус</h3>
+      <select id="statusSelect" onchange="changeStatus()">
+        <option value="">🚫 Нет статуса</option>
+        <!-- Сюда будут добавляться купленные статусы -->
+      </select>
+    </div>
+  </section>
+
+  <!-- ABOUT SCREEN (новый экран) -->
+  <section id="scr-about" class="screen">
+    <div class="about-header">
+      <div class="about-back" id="aboutBackBtn">←</div>
+      <h2 class="about-title">LOL Messenger</h2>
+    </div>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon">💬</div>
+        <div class="feature-name">Текстовые чаты</div>
+        <div class="feature-desc">Мгновенный обмен сообщениями с друзьями в реальном времени</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🔎</div>
+        <div class="feature-name">Поиск людей</div>
+        <div class="feature-desc">Находи друзей по никнейму и начинай общение</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🟢</div>
+        <div class="feature-name">Статус "онлайн"</div>
+        <div class="feature-desc">Видишь, кто сейчас в сети и готов общаться</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">✏️</div>
+        <div class="feature-name">"Печатает…"</div>
+        <div class="feature-desc">Знаешь, когда собеседник набирает сообщение</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">✔</div>
+        <div class="feature-name">Статусы доставки</div>
+        <div class="feature-desc">Одна галочка - доставлено, две галочки - прочитано</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🚫</div>
+        <div class="feature-name">Блокировка</div>
+        <div class="feature-desc">Можешь заблокировать любого пользователя одной кнопкой</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🖼️</div>
+        <div class="feature-name">Аватары</div>
+        <div class="feature-desc">Загружай свои фото и меняй их когда захочешь</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-name">Мгновенно</div>
+        <div class="feature-desc">Всё работает в реальном времени без перезагрузки</div>
+      </div>
+    </div>
+
+    <div style="margin: 24px 0; text-align: center;">
+      <span class="tech-badge">🔥 Firebase</span>
+      <span class="tech-badge">💨 Firestore</span>
+      <span class="tech-badge">🔐 SHA-256</span>
+      <span class="tech-badge">📱 PWA ready</span>
+    </div>
+
+    <div class="about-footer">
+      <p>Версия 4.0 (2026)</p>
+      <p style="font-size: 12px;">Создано с ❤️ для LOL Messenger</p>
+      <p style="font-size: 11px; margin-top: 8px;">Все данные хранятся в Firebase<br>Полностью бесплатно на Spark плане</p>
+    </div>
+  </section>
+
+  <!-- НОВЫЙ LIQUID TABBAR -->
+  <nav id="bottomNav" class="nav hidden">
+    <div class="tabbar" id="tabbar">
+      <div class="pill" id="pill"></div>
+      <button class="tab active" data-i="0" data-tab="chats">
+        <div class="icon">💬</div>
+        <div class="label">Чаты</div>
+      </button>
+      <button class="tab" data-i="1" data-tab="profile">
+        <div class="icon">👤</div>
+        <div class="label">Профиль</div>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Модалки -->
+  <div id="muteModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>На сколько минут заглушить?</h3>
+      <input type="number" id="muteMinutes" min="1" value="5">
+      <div class="modal-buttons">
+        <button class="modal-btn confirm" onclick="confirmMute()">✅</button>
+        <button class="modal-btn cancel" onclick="hideMuteModal()">❌</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- МОДАЛКА ПОДАРКА - только статусы из магазина -->
+  <div id="giftModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>🎁 Подарок</h3>
+      <select id="giftType" style="width:100%; margin-bottom:16px;">
+        <option value="coins">🤣 LOL коины</option>
+        <!-- Сюда будут добавляться статусы из магазина -->
+      </select>
+      <div id="giftCoinsInput">
+        <input type="number" id="giftCoins" placeholder="Количество коинов" min="1">
+      </div>
+      <div class="modal-buttons">
+        <button class="modal-btn confirm" onclick="confirmGift()">🎁 Подарить</button>
+        <button class="modal-btn cancel" onclick="hideGiftModal()">❌</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="creatorGiftModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>🎁➕ Отправить коины</h3>
+      <input type="number" id="creatorGiftCoins" placeholder="Количество коинов" min="1">
+      <div class="modal-buttons">
+        <button class="modal-btn confirm" onclick="confirmCreatorGift()">💰 Отправить</button>
+        <button class="modal-btn cancel" onclick="hideCreatorGiftModal()">❌</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модалка создания промокода -->
+  <div id="createPromoModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>➕ Создать промокод</h3>
+      
+      <input type="text" id="promoCodeInput" placeholder="Код промокода">
+      <input type="number" id="promoAmount" placeholder="Количество коинов">
+      
+      <!-- Выбор типа промокода -->
+      <div style="margin: 16px 0;">
+        <label style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+          <input type="radio" name="promoType" value="date" checked onchange="togglePromoType()"> 📅 По дате
+        </label>
+        <label style="display:flex; align-items:center; gap:10px;">
+          <input type="radio" name="promoType" value="count" onchange="togglePromoType()"> 🔢 По количеству
+        </label>
+      </div>
+      
+      <!-- Поля для разных типов -->
+      <div id="promoDateField">
+        <input type="date" id="promoDate" style="width:100%;">
+        <small style="color:var(--muted);">Промокод активен до этой даты</small>
+      </div>
+      
+      <div id="promoCountField" style="display:none;">
+        <input type="number" id="promoActivations" placeholder="Количество активаций" min="1">
+        <small style="color:var(--muted);">Сколько раз можно активировать</small>
+      </div>
+      
+      <div class="modal-buttons" style="margin-top:20px;">
+        <button class="modal-btn confirm" onclick="createPromo()">✅ Создать</button>
+        <button class="modal-btn cancel" onclick="hideCreatePromoModal()">❌ Отмена</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модалка добавления статуса -->
+  <div id="addItemModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>➕ Добавить статус</h3>
+      
+      <div style="margin-bottom:16px;">
+        <label style="display:block; margin-bottom:8px;">Тип:</label>
+        <select id="itemIconType" onchange="toggleItemIconInput()">
+          <option value="emoji">😊 Эмодзи</option>
+          <option value="image">🖼️ Изображение</option>
+        </select>
+      </div>
+      
+      <div id="itemEmojiField">
+        <input type="text" id="itemEmoji" placeholder="Введите эмодзи (например ⭐️)" maxlength="2">
+      </div>
+      
+      <div id="itemImageField" style="display:none;">
+        <input type="file" id="itemImage" accept="image/*">
+        <small style="color:var(--muted);">Загрузите изображение для статуса</small>
+      </div>
+      
+      <input type="text" id="itemName" placeholder="Название статуса (необязательно)">
+      <input type="number" id="itemPrice" placeholder="Рыночная цена" min="1">
+      
+      <div style="margin: 16px 0;">
+        <label style="display:flex; align-items:center; gap:10px;">
+          <input type="checkbox" id="itemLimited" onchange="toggleItemLimited()"> Лимитированный
+        </label>
+      </div>
+      
+      <div id="itemDateField" style="display:none;">
+        <input type="date" id="itemExpiryDate">
+        <small style="color:var(--muted);">Доступен для покупки до этой даты</small>
+      </div>
+      
+      <div class="modal-buttons" style="margin-top:20px;">
+        <button class="modal-btn confirm" onclick="createItem()">✅ Создать</button>
+        <button class="modal-btn cancel" onclick="hideAddItemModal()">❌ Отмена</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модалка редактирования статуса -->
+  <div id="editItemModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>✏️ Редактировать статус</h3>
+      
+      <input type="hidden" id="editItemId">
+      
+      <div style="margin-bottom:16px;">
+        <label style="display:block; margin-bottom:8px;">Тип:</label>
+        <select id="editIconType" onchange="toggleEditIconInput()">
+          <option value="emoji">😊 Эмодзи</option>
+          <option value="image">🖼️ Изображение</option>
+        </select>
+      </div>
+      
+      <div id="editEmojiField">
+        <input type="text" id="editEmoji" placeholder="Введите эмодзи" maxlength="2">
+      </div>
+      
+      <div id="editImageField" style="display:none;">
+        <input type="file" id="editImage" accept="image/*">
+        <small style="color:var(--muted);">Оставьте пустым, чтобы не менять</small>
+      </div>
+      
+      <input type="text" id="editName" placeholder="Название статуса">
+      <input type="number" id="editPrice" placeholder="Рыночная цена" min="1">
+      
+      <div style="margin: 16px 0;">
+        <label style="display:flex; align-items:center; gap:10px;">
+          <input type="checkbox" id="editLimited" onchange="toggleEditLimited()"> Лимитированный
+        </label>
+      </div>
+      
+      <div id="editDateField" style="display:none;">
+        <input type="date" id="editExpiryDate">
+        <small style="color:var(--muted);">Доступен для покупки до этой даты</small>
+      </div>
+      
+      <div class="modal-buttons" style="margin-top:20px;">
+        <button class="modal-btn confirm" onclick="saveItem()">✅ Сохранить</button>
+        <button class="modal-btn cancel" onclick="hideEditItemModal()">❌ Отмена</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="addBalanceModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>➕ Пополнить баланс</h3>
+      <input type="number" id="addBalanceAmount" placeholder="Сколько добавить?" min="1">
+      <div class="modal-buttons">
+        <button class="modal-btn confirm" onclick="addBalance()">💰 Пополнить</button>
+        <button class="modal-btn cancel" onclick="hideAddBalanceModal()">❌</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Firebase compat -->
+<script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
+
+<script>
+/* =========================
+   Firebase init
+========================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyCl9xOzUawqggpwyZQupGYm67RiWT42b7A",
+  authDomain: "lol-messenger-76286.firebaseapp.com",
+  projectId: "lol-messenger-76286",
+  storageBucket: "lol-messenger-76286.firebasestorage.app",
+  messagingSenderId: "573143866457",
+  appId: "1:573143866457:web:fb7ed67ea66848e6da2548"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+/* =========================
+   Helpers
+========================= */
+const $ = (id) => document.getElementById(id);
+const now = () => Date.now();
+const pad2 = (n)=> String(n).padStart(2,"0");
+const fmtTime = (ms)=> { const d=new Date(ms); return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`; };
+
+function escapeHtml(str){
+  return (str ?? "").toString()
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function showScreen(id){
+  ["scr-auth","scr-chats","scr-search","scr-chat","scr-profile","scr-about","scr-balance"].forEach(x => $(x).classList.remove("active"));
+  $(id).classList.add("active");
+  $("composer").style.display = (id === "scr-chat") ? "flex" : "none";
+  
+  // Показываем/скрываем таббар
+  if (id === "scr-auth" || id === "scr-about" || id === "scr-balance") {
+    $("bottomNav").classList.add("hidden");
+  } else {
+    $("bottomNav").classList.remove("hidden");
+  }
+  
+  // Обновляем баланс при показе экрана баланса
+  if (id === "scr-balance") {
+    updateBalanceScreen();
+    updatePromoStats();
+    loadShopItems();
+    updateSellSection();
+    updateStatusSelect();
+  }
+}
+
+function setMsg(el, text, kind){
+  el.className = (kind === "ok") ? "ok" : "err";
+  el.textContent = text;
+  el.classList.remove("hidden");
+}
+function clearMsg(el){
+  el.textContent = "";
+  el.classList.add("hidden");
+}
+
+function randId(prefix="u"){
+  return prefix + "_" + Math.random().toString(36).slice(2) + "_" + Math.random().toString(36).slice(2);
+}
+
+async function sha256Hex(text){
+  const enc = new TextEncoder();
+  const data = enc.encode(text);
+  const hash = await crypto.subtle.digest("SHA-256", data);
+  const bytes = Array.from(new Uint8Array(hash));
+  return bytes.map(b => b.toString(16).padStart(2,"0")).join("");
+}
+
+function chatIdFor(a,b){ return [a,b].sort().join("_"); }
+
+function isOnline(u){
+  const ls = u.lastSeen || 0;
+  return !!u.online && (now() - ls) < 45000;
+}
+
+/* =========================
+   Умный статус онлайн
+========================= */
+function onlineText(u) {
+  if (isOnline(u)) {
+    return '🟢 онлайн';
+  }
+  
+  const lastSeen = u.lastSeen || 0;
+  if (!lastSeen) return '⚫ оффлайн';
+  
+  const now = Date.now();
+  const diffMs = now - lastSeen;
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+  
+  const lastDate = new Date(lastSeen);
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  
+  const timeStr = lastDate.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+  
+  if (diffMins < 1) {
+    return '🔵 только что';
+  }
+  
+  if (diffMins < 60) {
+    return `🔵 был ${diffMins} ${getMinutesWord(diffMins)} назад`;
+  }
+  
+  if (lastDate.toDateString() === today.toDateString()) {
+    return `🔵 был сегодня в ${timeStr}`;
+  }
+  
+  if (lastDate.toDateString() === yesterday.toDateString()) {
+    return `🔵 был вчера в ${timeStr}`;
+  }
+  
+  const dayNames = ['воскресенье', 'понедельник', 'вторник', 'среду', 'четверг', 'пятницу', 'субботу'];
+  const dayIndex = lastDate.getDay();
+  const dayName = dayNames[dayIndex];
+  
+  if (diffDays < 7) {
+    return `🔵 был в ${dayName} в ${timeStr}`;
+  }
+  
+  const dateStr = lastDate.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  return `🔵 был ${dateStr}`;
+}
+
+function getMinutesWord(minutes) {
+  if (minutes >= 11 && minutes <= 14) return 'минут';
+  const lastDigit = minutes % 10;
+  if (lastDigit === 1) return 'минуту';
+  if (lastDigit >= 2 && lastDigit <= 4) return 'минуты';
+  return 'минут';
+}
+
+/* =========================
+   Загрузка аватарки
+========================= */
+async function uploadAvatar(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+/* =========================
+   Default avatar
+========================= */
+const defaultAvatar = "data:image/svg+xml;base64," + btoa(`
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#60a5fa"/>
+      <stop offset="1" stop-color="#a78bfa"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="80" fill="url(#g)"/>
+  <circle cx="128" cy="104" r="44" fill="rgba(255,255,255,.85)"/>
+  <path d="M48 218c18-44 54-66 80-66s62 22 80 66" fill="rgba(255,255,255,.78)"/>
+</svg>
+`);
+
+/* =========================
+   State
+========================= */
+let authMode = "login";
+let session = null;
+let me = null;
+let usersCache = new Map();
+let itemsCache = new Map(); // для статусов в магазине
+let selectedSellItems = new Set(); // выбранные для продажи статусы
+
+let peer = null;
+let currentChatId = null;
+
+let unsubChatList = null;
+let unsubMsgs = null;
+let unsubPeer = null;
+
+let heartbeatTimer = null;
+let typingTimer = null;
+let typingClearTimer = null;
+
+let isBlocked = false;
+let promosCache = new Map();
+
+const CREATOR_PASSWORD = 'Sigmohibutlos67?!';
+let muteTargetId = null;
+let muteTimers = new Map();
+
+/* =========================
+   Session persistence
+========================= */
+function loadSession(){
+  try{
+    const s = JSON.parse(localStorage.getItem("lol_session") || "null");
+    return s && s.uid ? s : null;
+  }catch{ return null; }
+}
+function saveSession(s){ localStorage.setItem("lol_session", JSON.stringify(s)); }
+function clearSession(){ localStorage.removeItem("lol_session"); }
+
+/* =========================
+   Auth UI
+========================= */
+function setAuthMode(mode){
+  authMode = mode;
+  $("segLogin").classList.toggle("active", mode==="login");
+  $("segReg").classList.toggle("active", mode==="reg");
+  $("regExtra").classList.toggle("hidden", mode!=="reg");
+  $("authBtn").textContent = mode==="login" ? "Войти" : "Создать аккаунт";
+  clearMsg($("authMsg"));
+}
+$("segLogin").addEventListener("click", ()=> setAuthMode("login"));
+$("segReg").addEventListener("click", ()=> setAuthMode("reg"));
+
+$("regAvatarPreview").src = defaultAvatar;
+
+function bindAvatarInput(fileEl, imgEl){
+  fileEl.addEventListener("change", (e)=>{
+    const f = e.target.files && e.target.files[0];
+    if(!f) return;
+    const r = new FileReader();
+    r.onload = (ev)=> { imgEl.src = ev.target.result; };
+    r.readAsDataURL(f);
+  });
+}
+bindAvatarInput($("regAvatarFile"), $("regAvatarPreview"));
+bindAvatarInput($("editAvatarFile"), $("editAvatarPreview"));
+
+/* =========================
+   Data access
+========================= */
+async function warmUsersCache(){
+  const snap = await db.collection("users").get();
+  usersCache.clear();
+  snap.forEach(d => usersCache.set(d.id, { uid:d.id, ...d.data() }));
+  if(session && usersCache.has(session.uid)) me = usersCache.get(session.uid);
+}
+
+async function loadMe(){
+  const snap = await db.collection("users").doc(session.uid).get();
+  if(!snap.exists) throw new Error("Аккаунт не найден.");
+  me = { uid: snap.id, ...snap.data() };
+  
+  // Убеждаемся, что массивы существуют
+  if (!me.customItems) me.customItems = [];
+  if (!me.selectedStatus) me.selectedStatus = "";
+  
+  usersCache.set(me.uid, me);
+}
+
+async function findUserByLogin(login){
+  const snap = await db.collection("users").where("login","==",login).limit(1).get();
+  if (snap.empty) return null;
+  const d = snap.docs[0];
+  return { uid: d.id, data: d.data() };
+}
+
+/* =========================
+   Online / heartbeat
+========================= */
+async function setOnline(flag){
+  if(!session) return;
+  try{
+    await db.collection("users").doc(session.uid).set({
+      online: !!flag,
+      lastSeen: now()
+    }, { merge:true });
+  }catch{}
+}
+
+function startHeartbeat(){
+  stopHeartbeat();
+  heartbeatTimer = setInterval(()=> setOnline(true), 15000);
+}
+function stopHeartbeat(){
+  if(heartbeatTimer){ clearInterval(heartbeatTimer); heartbeatTimer=null; }
+}
+
+window.addEventListener("beforeunload", ()=> setOnline(false));
+document.addEventListener("visibilitychange", ()=>{
+  if(document.hidden) setOnline(false);
+  else setOnline(true);
+});
+
+/* =========================
+   Функции создателя
+========================= */
+$("creatorBtn").addEventListener("click", async () => {
+  if (me.role === "creator") {
+    if (confirm("Вы уверены, что хотите убрать права создателя?")) {
+      try {
+        await db.collection("users").doc(me.uid).update({ role: "user" });
+        me.role = "user";
+        renderProfile();
+        alert("👤 Права создателя убраны");
+      } catch (e) {
+        alert("Ошибка: " + e.message);
+      }
+    }
+  } else {
+    const pass = prompt("Введите пароль создателя:");
+    if (pass !== CREATOR_PASSWORD) {
+      alert("Неверный пароль!");
+      return;
+    }
+
+    try {
+      await db.collection("users").doc(me.uid).update({ role: "creator" });
+      me.role = "creator";
+      renderProfile();
+      alert("🎉 Теперь вы создатель!");
+    } catch (e) {
+      alert("Ошибка: " + e.message);
+    }
+  }
+});
+
+/* =========================
+   Верификация
+========================= */
+async function toggleVerify(userId) {
+  if (me?.role !== "creator") return;
+  
+  try {
+    const userRef = db.collection("users").doc(userId);
+    const userSnap = await userRef.get();
+    await userRef.update({ verified: !userSnap.data().verified });
+  } catch (e) {
+    console.error("Ошибка верификации:", e);
+  }
+}
+
+/* =========================
+   Мут
+========================= */
+function showMuteModal(userId) {
+  if (me?.role !== "creator") return;
+  muteTargetId = userId;
+  $("muteModal").classList.remove("hidden");
+}
+
+function hideMuteModal() {
+  $("muteModal").classList.add("hidden");
+  muteTargetId = null;
+}
+
+async function confirmMute() {
+  if (!muteTargetId || me?.role !== "creator") {
+    hideMuteModal();
+    return;
+  }
+
+  const minutes = parseInt($("muteMinutes").value);
+  if (isNaN(minutes) || minutes < 1) {
+    alert("Введите корректное количество минут");
+    return;
+  }
+
+  try {
+    const userRef = db.collection("users").doc(muteTargetId);
+    const userSnap = await userRef.get();
+    const userData = userSnap.data();
+    
+    if (userData.mutedUntil && userData.mutedUntil > now()) {
+      await userRef.update({
+        mutedUntil: 0,
+        mutedBy: null
+      });
+      
+      if (muteTimers.has(muteTargetId)) {
+        clearTimeout(muteTimers.get(muteTargetId));
+        muteTimers.delete(muteTargetId);
+      }
+      
+      alert(`🔊 Мут снят с пользователя`);
+    } else {
+      const mutedUntil = now() + minutes * 60 * 1000;
+      await userRef.update({
+        mutedUntil: mutedUntil,
+        mutedBy: me.uid
+      });
+      
+      const timer = setTimeout(async () => {
+        try {
+          await userRef.update({
+            mutedUntil: 0,
+            mutedBy: null
+          });
+          muteTimers.delete(muteTargetId);
+        } catch (e) {
+          console.error("Ошибка при автоснятии мута:", e);
+        }
+      }, minutes * 60 * 1000);
+      
+      muteTimers.set(muteTargetId, timer);
+      
+      alert(`🔇 Пользователь заглушен на ${minutes} минут`);
+    }
+  } catch (e) {
+    console.error("Ошибка мута:", e);
+    alert("Ошибка при выполнении операции");
+  }
+
+  hideMuteModal();
+}
+
+async function checkMuteStatus(userId) {
+  if (!userId) return false;
+  
+  try {
+    const userSnap = await db.collection("users").doc(userId).get();
+    if (!userSnap.exists) return false;
+    
+    const userData = userSnap.data();
+    if (userData.mutedUntil && userData.mutedUntil > now()) {
+      return true;
+    }
+    
+    if (userData.mutedUntil && userData.mutedUntil <= now()) {
+      await db.collection("users").doc(userId).update({
+        mutedUntil: 0,
+        mutedBy: null
+      });
+    }
+    
+    return false;
+  } catch (e) {
+    console.error("Ошибка проверки мута:", e);
+    return false;
+  }
+}
+
+/* =========================
+   Блокировка по чату
+========================= */
+async function toggleBlockInChat() {
+  if (!currentChatId || !me || !peer) return;
+
+  const blockRef = db.collection("blocks").doc(currentChatId);
+  await db.runTransaction(async (transaction) => {
+    const blockDoc = await transaction.get(blockRef);
+    const blockedBy = blockDoc.exists ? blockDoc.data().blockedBy || [] : [];
+    
+    if (blockedBy.includes(me.uid)) {
+      transaction.set(blockRef, { blockedBy: blockedBy.filter(id => id !== me.uid) }, { merge: true });
+      isBlocked = false;
+      updateChatUI();
+      alert("🔓 Разблокировано в этом чате");
+    } else {
+      transaction.set(blockRef, { blockedBy: [...blockedBy, me.uid] }, { merge: true });
+      isBlocked = true;
+      updateChatUI();
+      alert("🔒 Заблокировано в этом чате");
+    }
+  });
+}
+
+async function checkChatBlockStatus() {
+  if (!currentChatId || !me) return false;
+  
+  const blockRef = db.collection("blocks").doc(currentChatId);
+  const blockDoc = await blockRef.get();
+  
+  if (blockDoc.exists) {
+    const blockedBy = blockDoc.data().blockedBy || [];
+    if (blockedBy.includes(me.uid)) {
+      isBlocked = true;
+      return true;
+    }
+  }
+  
+  isBlocked = false;
+  return false;
+}
+
+/* =========================
+   Tabs
+========================= */
+function setTab(tab){
+  document.querySelectorAll(".navItem").forEach(x=>x.classList.remove("active"));
+  
+  const tabs = document.querySelectorAll('.tab');
+  tabs.forEach(t => t.classList.remove('active'));
+  
+  if (tab === 'chats') {
+    tabs[0].classList.add('active');
+    showScreen('scr-chats');
+    setTimeout(() => {
+      const startIndex = 0;
+      setPillToIndex(startIndex);
+    }, 10);
+  } else if (tab === 'profile') {
+    tabs[1].classList.add('active');
+    showScreen('scr-profile');
+    setTimeout(() => {
+      const startIndex = 1;
+      setPillToIndex(startIndex);
+    }, 10);
+  }
+}
+
+// Таббар
+const bar = document.getElementById('tabbar');
+const pill = document.getElementById('pill');
+const tabs = Array.from(bar.querySelectorAll('.tab'));
+
+let holding = false;
+let dragged = false;
+let downX = 0;
+let lastIndex = 0;
+
+const DRAG_THRESHOLD = 8;
+
+function waterOn(){ bar.classList.add('is-water'); }
+function waterOff(){
+  bar.classList.remove('is-water');
+  tabs.forEach(t => t.classList.remove('is-hovered'));
+}
+
+function setActiveIndex(i){
+  tabs.forEach(t => t.classList.remove('active'));
+  tabs[i].classList.add('active');
+}
+
+function setHoveredIndex(i){
+  tabs.forEach(t => t.classList.remove('is-hovered'));
+  tabs[i].classList.add('is-hovered');
+}
+
+function indexFromClientX(clientX){
+  const r = bar.getBoundingClientRect();
+  const x = Math.min(Math.max(clientX - r.left, 0), r.width);
+  const colW = r.width / 2;
+  let i = Math.floor(x / colW);
+  return Math.max(0, Math.min(1, i));
+}
+
+function setPillToIndex(i){
+  const barRect = bar.getBoundingClientRect();
+  const tabRect = tabs[i].getBoundingClientRect();
+  const pad = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pad')) || 7;
+  const x = tabRect.left - barRect.left - pad;
+  pill.style.setProperty('--x', `${x}px`);
+  lastIndex = i;
+}
+
+bar.addEventListener('pointerdown', (e) => {
+  holding = true;
+  dragged = false;
+  downX = e.clientX;
+  waterOn();
+  const i = indexFromClientX(e.clientX);
+  setHoveredIndex(i);
+  setPillToIndex(i);
+});
+
+bar.addEventListener('pointermove', (e) => {
+  if (!holding) return;
+  const dx = Math.abs(e.clientX - downX);
+  if (dx > DRAG_THRESHOLD) dragged = true;
+
+  const i = indexFromClientX(e.clientX);
+  setHoveredIndex(i);
+  setPillToIndex(i);
+});
+
+bar.addEventListener('pointerup', (e) => {
+  if (!holding) return;
+  holding = false;
+
+  const i = indexFromClientX(e.clientX);
+  setActiveIndex(i);
+
+  const tabName = i === 0 ? 'chats' : 'profile';
+  setTab(tabName);
+
+  if (!dragged){
+    waterOn();
+    setPillToIndex(i);
+    setTimeout(waterOff, 400);
+  } else {
+    waterOff();
+  }
+});
+
+const startIndex = tabs.findIndex(t => t.classList.contains('active'));
+if (startIndex >= 0) {
+  setPillToIndex(startIndex);
+}
+
+/* =========================
+   Auth action
+========================= */
+$("authBtn").addEventListener("click", async ()=>{
+  clearMsg($("authMsg"));
+  const login = $("loginLogin").value.trim();
+  const pass  = $("loginPass").value;
+
+  if(!login || !pass){
+    return setMsg($("authMsg"), "Заполни логин и пароль.", "err");
+  }
+
+  try{
+    if(authMode === "reg"){
+      const nick = $("regNick").value.trim();
+      const phone = $("regPhone").value.trim();
+      const avatar = $("regAvatarPreview").src || defaultAvatar;
+
+      if(!nick){
+        return setMsg($("authMsg"), "Нужен никнейм.", "err");
+      }
+
+      const exists = await findUserByLogin(login);
+      if(exists){
+        return setMsg($("authMsg"), "Такой логин уже занят.", "err");
+      }
+
+      const uid  = randId("u");
+      const salt = randId("s");
+      const passwordHash = await sha256Hex(`${login}:${pass}:${salt}`);
+
+      await db.collection("users").doc(uid).set({
+        login,
+        salt,
+        passwordHash,
+        nick,
+        phone,
+        avatar,
+        online: true,
+        lastSeen: now(),
+        typingTo: "",
+        typingAt: 0,
+        role: "user",
+        star: false,
+        customItems: [], // для кастомных статусов
+        balance: 100,
+        mutedUntil: 0,
+        mutedBy: null,
+        selectedStatus: ""
+      });
+
+      session = { uid, login };
+      saveSession(session);
+      await afterLogin();
+      return;
+    }
+
+    const found = await findUserByLogin(login);
+    if(!found){
+      return setMsg($("authMsg"), "Аккаунт не найден.", "err");
+    }
+    const { uid, data } = found;
+    const calc = await sha256Hex(`${login}:${pass}:${data.salt}`);
+    if(calc !== data.passwordHash){
+      return setMsg($("authMsg"), "Неверный пароль.", "err");
+    }
+
+    session = { uid, login };
+    saveSession(session);
+    await afterLogin();
+  }catch(e){
+    setMsg($("authMsg"), "Ошибка: " + (e?.message || String(e)), "err");
+  }
+});
+
+/* =========================
+   After login / logout
+========================= */
+async function afterLogin(){
+  $("bottomNav").classList.remove("hidden");
+  await setOnline(true);
+  startHeartbeat();
+
+  await warmUsersCache();
+  await loadMe();
+  
+  // Загружаем статусы
+  const itemsSnap = await db.collection("items").get();
+  itemsCache.clear();
+  itemsSnap.forEach(doc => itemsCache.set(doc.id, { id: doc.id, ...doc.data() }));
+  
+  renderProfile();
+  await updateStatusSelect(); // Обновляем селект статусов
+
+  bindChatListRealtime();
+
+  showScreen("scr-chats");
+  setTab("chats");
+}
+
+async function logout(){
+  try{ await clearMyTyping(); }catch{}
+  try{ await setOnline(false); }catch{}
+  stopHeartbeat();
+
+  if(unsubChatList){ unsubChatList(); unsubChatList=null; }
+  if(unsubMsgs){ unsubMsgs(); unsubMsgs=null; }
+  if(unsubPeer){ unsubPeer(); unsubPeer=null; }
+
+  session=null; me=null; peer=null; currentChatId=null;
+  usersCache.clear();
+
+  clearSession();
+  $("bottomNav").classList.add("hidden");
+  showScreen("scr-auth");
+}
+$("btnLogout").addEventListener("click", logout);
+$("btnLogout2").addEventListener("click", logout);
+
+$("resetDeviceBtn").addEventListener("click", ()=>{
+  localStorage.removeItem("lol_session");
+  location.reload();
+});
+
+/* =========================
+   About screen
+========================= */
+$("aboutBtn").addEventListener("click", ()=>{
+  showScreen("scr-about");
+});
+
+$("aboutBackBtn").addEventListener("click", ()=>{
+  showScreen("scr-profile");
+});
+
+/* =========================
+   Магазин и статусы
+========================= */
+async function loadShopItems() {
+  const snap = await db.collection("items").get();
+  itemsCache.clear();
+  snap.forEach(doc => itemsCache.set(doc.id, { id: doc.id, ...doc.data() }));
+  
+  const shopGrid = $("shopItems");
+  shopGrid.innerHTML = "";
+  
+  itemsCache.forEach(item => {
+    if (item.isActive === false) return; // удалённые не показываем
+    
+    const isExpired = item.limited && item.expiresAt && item.expiresAt < now();
+    const canBuy = !isExpired;
+    
+    const itemDiv = document.createElement("div");
+    itemDiv.className = "shop-item";
+    
+    let iconHtml = '';
+    if (item.iconType === 'image') {
+      iconHtml = `<img src="${item.icon}" class="shop-item-badge" style="width:40px; height:40px; border-radius:8px;">`;
+    } else {
+      iconHtml = `<div class="shop-item-badge">${item.icon}</div>`;
+    }
+    
+    let actions = "";
+    if (me?.role === "creator") {
+      actions = `
+        <div class="shop-item-actions">
+          <button class="btn ghost" style="padding:4px 8px;" onclick="editItem('${item.id}')">✏️</button>
+          <button class="btn ghost" style="padding:4px 8px;" onclick="deleteItem('${item.id}')">🗑️</button>
+        </div>
+      `;
+    }
+    
+    const priceDisplay = canBuy 
+      ? `<div class="shop-item-price">${item.price} 🤣</div>`
+      : `<div class="shop-item-price" style="color:var(--red);">${item.price} 🤣</div>`;
+    
+    const buyButton = canBuy
+      ? `<button class="btn ghost" onclick="buyItem('${item.id}')" style="padding:8px;">Купить</button>`
+      : `<div class="shop-item-expired">⏰ Срок окончен</div>`;
+    
+    const nameHtml = item.name ? `<div style="margin-bottom:8px;">${escapeHtml(item.name)}</div>` : "";
+    
+    itemDiv.innerHTML = `
+      ${iconHtml}
+      ${nameHtml}
+      ${priceDisplay}
+      ${item.limited && item.expiresAt ? `<div style="font-size:11px; color:var(--muted);">до ${new Date(item.expiresAt).toLocaleDateString()}</div>` : ''}
+      ${buyButton}
+      ${actions}
+    `;
+    
+    shopGrid.appendChild(itemDiv);
+  });
+}
+
+async function buyItem(itemId) {
+  if (!me) return;
+  
+  const item = itemsCache.get(itemId);
+  if (!item) return;
+  
+  // Проверка на лимитированный и истёкший
+  if (item.limited && item.expiresAt && item.expiresAt < now()) {
+    alert("Срок покупки этого статуса истёк");
+    return;
+  }
+  
+  // Проверка баланса
+  if (me.balance < item.price) {
+    alert(`❌ Недостаточно LOL коинов! Нужно ${item.price}, у вас ${me.balance}`);
+    return;
+  }
+  
+  // Проверка, есть ли уже такой статус
+  if (itemId === 'star' && me.star) {
+    alert("❌ У вас уже есть звезда!");
+    return;
+  }
+  
+  if (me.customItems && me.customItems.includes(itemId)) {
+    alert("❌ У вас уже есть этот статус!");
+    return;
+  }
+  
+  if (!confirm(`Купить ${item.name || 'статус'} за ${item.price} 🤣?`)) return;
+  
+  try {
+    await db.runTransaction(async (transaction) => {
+      transaction.update(db.collection("users").doc(me.uid), {
+        balance: firebase.firestore.FieldValue.increment(-item.price)
+      });
+      
+      if (itemId === 'star') {
+        transaction.update(db.collection("users").doc(me.uid), {
+          star: true
+        });
+      } else {
+        transaction.update(db.collection("users").doc(me.uid), {
+          customItems: firebase.firestore.FieldValue.arrayUnion(itemId)
+        });
+      }
+    });
+    
+    me.balance -= item.price;
+    if (itemId === 'star') {
+      me.star = true;
+    } else {
+      if (!me.customItems) me.customItems = [];
+      me.customItems.push(itemId);
+    }
+    
+    // Обновляем все UI элементы
+    await updateSellSection();
+    await updateStatusSelect();
+    renderProfile();
+    
+    alert("✅ Покупка успешна!");
+    updateBalanceScreen();
+  } catch (e) {
+    console.error("Ошибка покупки:", e);
+    alert("Ошибка при покупке");
+  }
+}
+
+// Функции для создателя (управление статусами)
+function showAddItemModal() {
+  if (me?.role !== "creator") return;
+  $("addItemModal").classList.remove("hidden");
+  $("itemEmoji").value = "";
+  $("itemName").value = "";
+  $("itemPrice").value = "";
+  $("itemImage").value = "";
+  $("itemExpiryDate").value = "";
+  $("itemLimited").checked = false;
+  toggleItemLimited();
+  toggleItemIconInput();
+}
+
+function hideAddItemModal() {
+  $("addItemModal").classList.add("hidden");
+}
+
+function toggleItemIconInput() {
+  const type = $("itemIconType").value;
+  if (type === 'emoji') {
+    $("itemEmojiField").style.display = "block";
+    $("itemImageField").style.display = "none";
+  } else {
+    $("itemEmojiField").style.display = "none";
+    $("itemImageField").style.display = "block";
+  }
+}
+
+function toggleItemLimited() {
+  if ($("itemLimited").checked) {
+    $("itemDateField").style.display = "block";
+  } else {
+    $("itemDateField").style.display = "none";
+  }
+}
+
+async function createItem() {
+  const type = $("itemIconType").value;
+  const name = $("itemName").value.trim() || "";
+  const price = parseInt($("itemPrice").value);
+  const limited = $("itemLimited").checked;
+  
+  let icon = "";
+  let iconType = type;
+  
+  if (type === 'emoji') {
+    icon = $("itemEmoji").value.trim();
+    if (!icon) {
+      alert("Введите эмодзи");
+      return;
+    }
+  } else {
+    const file = $("itemImage").files[0];
+    if (!file) {
+      alert("Выберите изображение");
+      return;
+    }
+    icon = await uploadAvatar(file);
+  }
+  
+  if (!price || price < 1) {
+    alert("Введите цену");
+    return;
+  }
+  
+  let expiresAt = null;
+  if (limited) {
+    const date = $("itemExpiryDate").value;
+    if (!date) {
+      alert("Выберите дату окончания");
+      return;
+    }
+    expiresAt = new Date(date).getTime();
+  }
+  
+  try {
+    const itemRef = db.collection("items").doc();
+    await itemRef.set({
+      iconType,
+      icon,
+      name,
+      price,
+      limited,
+      expiresAt,
+      createdAt: now(),
+      createdBy: me.uid,
+      isActive: true
+    });
+    
+    alert("✅ Статус создан!");
+    hideAddItemModal();
+    loadShopItems();
+  } catch (e) {
+    console.error("Ошибка создания статуса:", e);
+    alert("Ошибка при создании");
+  }
+}
+
+async function editItem(itemId) {
+  if (me?.role !== "creator") return;
+  
+  const item = itemsCache.get(itemId);
+  if (!item) return;
+  
+  $("editItemId").value = itemId;
+  $("editName").value = item.name || "";
+  $("editPrice").value = item.price;
+  $("editLimited").checked = item.limited || false;
+  
+  if (item.iconType === 'emoji') {
+    $("editIconType").value = 'emoji';
+    $("editEmoji").value = item.icon;
+  } else {
+    $("editIconType").value = 'image';
+  }
+  
+  toggleEditIconInput();
+  toggleEditLimited();
+  
+  if (item.limited && item.expiresAt) {
+    const date = new Date(item.expiresAt).toISOString().split('T')[0];
+    $("editExpiryDate").value = date;
+  }
+  
+  $("editItemModal").classList.remove("hidden");
+}
+
+function hideEditItemModal() {
+  $("editItemModal").classList.add("hidden");
+}
+
+function toggleEditIconInput() {
+  const type = $("editIconType").value;
+  if (type === 'emoji') {
+    $("editEmojiField").style.display = "block";
+    $("editImageField").style.display = "none";
+  } else {
+    $("editEmojiField").style.display = "none";
+    $("editImageField").style.display = "block";
+  }
+}
+
+function toggleEditLimited() {
+  if ($("editLimited").checked) {
+    $("editDateField").style.display = "block";
+  } else {
+    $("editDateField").style.display = "none";
+  }
+}
+
+async function saveItem() {
+  const itemId = $("editItemId").value;
+  const type = $("editIconType").value;
+  const name = $("editName").value.trim() || "";
+  const price = parseInt($("editPrice").value);
+  const limited = $("editLimited").checked;
+  
+  let icon = null;
+  let iconType = type;
+  
+  if (type === 'emoji') {
+    icon = $("editEmoji").value.trim();
+    if (!icon) {
+      alert("Введите эмодзи");
+      return;
+    }
+  } else {
+    const file = $("editImage").files[0];
+    if (file) {
+      icon = await uploadAvatar(file);
+    }
+  }
+  
+  if (!price || price < 1) {
+    alert("Введите цену");
+    return;
+  }
+  
+  let expiresAt = null;
+  if (limited) {
+    const date = $("editExpiryDate").value;
+    if (!date) {
+      alert("Выберите дату окончания");
+      return;
+    }
+    expiresAt = new Date(date).getTime();
+  }
+  
+  const updateData = {
+    name,
+    price,
+    limited,
+    expiresAt
+  };
+  
+  if (icon) {
+    updateData.iconType = iconType;
+    updateData.icon = icon;
+  }
+  
+  try {
+    await db.collection("items").doc(itemId).update(updateData);
+    
+    alert("✅ Статус обновлён!");
+    hideEditItemModal();
+    loadShopItems();
+  } catch (e) {
+    console.error("Ошибка обновления статуса:", e);
+    alert("Ошибка при обновлении");
+  }
+}
+
+async function deleteItem(itemId) {
+  if (me?.role !== "creator") return;
+  
+  if (!confirm("Удалить этот статус из магазина? У кого он уже есть — останется.")) return;
+  
+  try {
+    await db.collection("items").doc(itemId).update({
+      isActive: false
+    });
+    
+    alert("✅ Статус удалён из магазина");
+    loadShopItems();
+  } catch (e) {
+    console.error("Ошибка удаления статуса:", e);
+    alert("Ошибка при удалении");
+  }
+}
+
+/* =========================
+   Продажа статусов
+========================= */
+async function updateSellSection() {
+  if (!me) return;
+  
+  // Принудительно загружаем статусы из БД
+  const itemsSnap = await db.collection("items").get();
+  itemsCache.clear();
+  itemsSnap.forEach(doc => itemsCache.set(doc.id, { id: doc.id, ...doc.data() }));
+  
+  const sellItemsDiv = $("sellItems");
+  sellItemsDiv.innerHTML = "";
+  selectedSellItems.clear();
+  
+  // Звезда
+  if (me.star) {
+    addSellItem('star', '⭐️ Звезда', 500);
+  }
+  
+  // Кастомные статусы
+  if (me.customItems && me.customItems.length > 0) {
+    me.customItems.forEach(itemId => {
+      const item = itemsCache.get(itemId);
+      if (item) {
+        const displayName = item.name || 'Статус';
+        let iconHtml = '';
+        if (item.iconType === 'image') {
+          iconHtml = `<img src="${item.icon}" class="sell-item-icon">`;
+        } else {
+          iconHtml = `<span style="font-size:20px;">${item.icon}</span>`;
+        }
+        addSellItem(itemId, `${iconHtml} ${displayName}`, item.price);
+      }
+    });
+  }
+  
+  updateSellTotal();
+}
+
+function addSellItem(itemId, displayHtml, price) {
+  const sellPrice = Math.floor(price * 0.8); // 20% комиссия
+  
+  const itemDiv = document.createElement("div");
+  itemDiv.className = "sell-item";
+  itemDiv.innerHTML = `
+    <input type="checkbox" id="sell_${itemId}" value="${itemId}" data-price="${sellPrice}" onchange="updateSellSelection(this)">
+    <label for="sell_${itemId}">${displayHtml} — ${sellPrice} 🤣 (-20% от рыночной цены)</label>
+  `;
+  
+  $("sellItems").appendChild(itemDiv);
+}
+
+function updateSellSelection(checkbox) {
+  const price = parseInt(checkbox.dataset.price);
+  if (checkbox.checked) {
+    selectedSellItems.add({
+      id: checkbox.value,
+      price: price
+    });
+  } else {
+    selectedSellItems.forEach(item => {
+      if (item.id === checkbox.value) selectedSellItems.delete(item);
+    });
+  }
+  
+  updateSellTotal();
+}
+
+function updateSellTotal() {
+  const total = Array.from(selectedSellItems).reduce((sum, item) => sum + item.price, 0);
+  const count = selectedSellItems.size;
+  
+  $("sellTotal").innerHTML = `Выбрано: ${count} статус${count !== 1 ? 'ов' : ''} на сумму ${total} 🤣`;
+  $("sellBtn").disabled = count === 0;
+}
+
+async function sellSelected() {
+  if (selectedSellItems.size === 0) return;
+  
+  const total = Array.from(selectedSellItems).reduce((sum, item) => sum + item.price, 0);
+  
+  if (!confirm(`Продать выбранные статусы за ${total} 🤣? Они будут удалены навсегда.`)) return;
+  
+  try {
+    await db.runTransaction(async (transaction) => {
+      // Обновляем баланс
+      transaction.update(db.collection("users").doc(me.uid), {
+        balance: firebase.firestore.FieldValue.increment(total)
+      });
+      
+      // Удаляем статусы
+      for (const item of selectedSellItems) {
+        if (item.id === 'star') {
+          transaction.update(db.collection("users").doc(me.uid), {
+            star: false
+          });
+        } else {
+          transaction.update(db.collection("users").doc(me.uid), {
+            customItems: firebase.firestore.FieldValue.arrayRemove(item.id)
+          });
+        }
+      }
+    });
+    
+    // ПРИНУДИТЕЛЬНО ОБНОВЛЯЕМ ДАННЫЕ ИЗ БД
+    const freshUser = await db.collection("users").doc(me.uid).get();
+    me = { uid: me.uid, ...freshUser.data() };
+    
+    // Убеждаемся, что массивы существуют
+    if (!me.customItems) me.customItems = [];
+    if (!me.selectedStatus) me.selectedStatus = "";
+    
+    usersCache.set(me.uid, me);
+    
+    selectedSellItems.clear();
+    alert(`✅ Продано! Получено ${total} 🤣`);
+    
+    // Обновляем все UI элементы
+    await updateSellSection();
+    await updateBalanceScreen();
+    await updateStatusSelect();
+    renderProfile();
+    
+  } catch (e) {
+    console.error("Ошибка при продаже:", e);
+    alert("Ошибка при продаже");
+  }
+}
+
+/* =========================
+   Balance screen
+========================= */
+$("balanceBtn").addEventListener("click", ()=>{
+  showScreen("scr-balance");
+  updateBalanceScreen();
+});
+
+$("balanceBackBtn").addEventListener("click", ()=>{
+  showScreen("scr-profile");
+});
+
+async function updateBalanceScreen() {
+  if (!me) return;
+  
+  $("balanceAmount").textContent = me.balance || 0;
+  
+  // Показываем кнопку добавления только для создателя
+  if (me.role === "creator") {
+    $("addBalanceBtn").style.display = "inline-block";
+    $("addItemBtn").style.display = "inline-block";
+    $("creatorPromoSection").style.display = "block";
+    $("addBalanceBtn").onclick = showAddBalanceModal;
+  } else {
+    $("addBalanceBtn").style.display = "none";
+    $("addItemBtn").style.display = "none";
+    $("creatorPromoSection").style.display = "none";
+  }
+}
+
+async function updateStatusSelect() {
+  // ПРИНУДИТЕЛЬНО загружаем статусы из БД
+  const itemsSnap = await db.collection("items").get();
+  itemsCache.clear();
+  itemsSnap.forEach(doc => itemsCache.set(doc.id, { id: doc.id, ...doc.data() }));
+  
+  const statusSelect = $("statusSelect");
+  
+  // Очищаем все опции кроме первой
+  while (statusSelect.options.length > 1) {
+    statusSelect.remove(1);
+  }
+  
+  console.log("Мои статусы:", me.customItems); // для отладки
+  console.log("Кэш статусов:", Array.from(itemsCache.keys())); // для отладки
+  
+  // Добавляем звезду, если есть
+  if (me.star) {
+    const option = document.createElement("option");
+    option.value = "star";
+    option.textContent = "⭐️ Звезда";
+    if (me.selectedStatus === "star") option.selected = true;
+    statusSelect.appendChild(option);
+  }
+  
+  // Добавляем кастомные статусы
+  if (me.customItems && me.customItems.length > 0) {
+    me.customItems.forEach(itemId => {
+      const item = itemsCache.get(itemId);
+      if (item) {
+        const option = document.createElement("option");
+        option.value = itemId;
+        
+        if (item.iconType === 'image') {
+          // Для фото создаём кастомную опцию с картинкой
+          option.style.backgroundImage = `url('${item.icon}')`;
+          option.style.backgroundSize = '20px';
+          option.style.backgroundRepeat = 'no-repeat';
+          option.style.backgroundPosition = 'left center';
+          option.style.paddingLeft = '30px';
+          option.textContent = item.name || 'Статус';
+        } else {
+          option.textContent = `${item.icon} ${item.name || 'Статус'}`;
+        }
+        
+        if (me.selectedStatus === itemId) option.selected = true;
+        statusSelect.appendChild(option);
+      }
+    });
+  }
+}
+
+async function changeStatus() {
+  const statusSelect = $("statusSelect");
+  const newStatus = statusSelect.value;
+  
+  await db.collection("users").doc(me.uid).update({
+    selectedStatus: newStatus
+  });
+  
+  me.selectedStatus = newStatus;
+  renderProfile(); // обновляем отображение ника
+}
+
+/* =========================
+   Промокоды
+========================= */
+function togglePromoType() {
+  const type = document.querySelector('input[name="promoType"]:checked').value;
+  if (type === 'date') {
+    $("promoDateField").style.display = "block";
+    $("promoCountField").style.display = "none";
+  } else {
+    $("promoDateField").style.display = "none";
+    $("promoCountField").style.display = "block";
+  }
+}
+
+async function activatePromo() {
+  const code = $("promoCode").value.trim();
+  if (!code) return;
+  
+  const promoRef = db.collection("promocodes").doc(code);
+  const promoDoc = await promoRef.get();
+  
+  if (!promoDoc.exists) {
+    alert("Промокод не найден");
+    return;
+  }
+  
+  const promo = promoDoc.data();
+  
+  // Проверка активности в зависимости от типа
+  if (promo.type === 'date') {
+    if (promo.expiresAt < now()) {
+      alert("Срок действия промокода истёк");
+      return;
+    }
+  } else {
+    if (promo.activationsLeft <= 0) {
+      alert("Промокод больше не активен");
+      return;
+    }
+  }
+  
+  // Проверяем, не активировал ли уже пользователь
+  const userPromoRef = db.collection("userPromocodes").doc(`${me.uid}_${code}`);
+  const userPromoDoc = await userPromoRef.get();
+  
+  if (userPromoDoc.exists) {
+    alert("❌ Вы уже активировали этот промокод");
+    return;
+  }
+  
+  try {
+    await db.runTransaction(async (transaction) => {
+      if (promo.type !== 'date') {
+        transaction.update(promoRef, {
+          activationsLeft: promo.activationsLeft - 1
+        });
+      }
+      
+      transaction.set(userPromoRef, {
+        userId: me.uid,
+        promoCode: code,
+        activatedAt: now()
+      });
+      
+      transaction.update(db.collection("users").doc(me.uid), {
+        balance: firebase.firestore.FieldValue.increment(promo.amount)
+      });
+    });
+    
+    me.balance += promo.amount;
+    alert(`✅ Промокод активирован! +${promo.amount} LOL`);
+    updateBalanceScreen();
+    $("promoCode").value = "";
+  } catch (e) {
+    console.error("Ошибка активации промокода:", e);
+    alert("Ошибка при активации");
+  }
+}
+
+function showCreatePromoModal() {
+  if (me?.role !== "creator") return;
+  $("createPromoModal").classList.remove("hidden");
+  // Сбрасываем поля
+  $("promoCodeInput").value = "";
+  $("promoAmount").value = "";
+  $("promoDate").value = "";
+  $("promoActivations").value = "";
+  document.querySelector('input[name="promoType"][value="date"]').checked = true;
+  togglePromoType();
+}
+
+function hideCreatePromoModal() {
+  $("createPromoModal").classList.add("hidden");
+}
+
+async function createPromo() {
+  const code = $("promoCodeInput").value.trim();
+  const amount = parseInt($("promoAmount").value);
+  const type = document.querySelector('input[name="promoType"]:checked').value;
+  
+  let promoData = {
+    code,
+    amount,
+    type,
+    createdBy: me.uid,
+    createdAt: now()
+  };
+  
+  if (type === 'date') {
+    const date = $("promoDate").value;
+    if (!date) {
+      alert("Выберите дату окончания");
+      return;
+    }
+    promoData.expiresAt = new Date(date).getTime();
+    promoData.activationsLeft = 999999; // практически бесконечно
+  } else {
+    const activations = parseInt($("promoActivations").value);
+    if (!activations || activations < 1) {
+      alert("Введите количество активаций");
+      return;
+    }
+    promoData.activationsTotal = activations;
+    promoData.activationsLeft = activations;
+  }
+  
+  if (!code || !amount) {
+    alert("Заполните все поля");
+    return;
+  }
+  
+  try {
+    await db.collection("promocodes").doc(code).set(promoData);
+    alert("✅ Промокод создан!");
+    hideCreatePromoModal();
+    updatePromoStats();
+  } catch (e) {
+    console.error("Ошибка создания промокода:", e);
+    alert("Ошибка при создании");
+  }
+}
+
+async function updatePromoStats() {
+  if (!me || me.role !== "creator") return;
+  
+  const promosSnapshot = await db.collection("promocodes").get();
+  const statsList = $("promoStatsList");
+  statsList.innerHTML = "";
+  
+  promosSnapshot.forEach(doc => {
+    const promo = doc.data();
+    const row = document.createElement("div");
+    row.className = "promo-stat-row";
+    
+    let statusText = "";
+    if (promo.type === 'date') {
+      const expiryDate = new Date(promo.expiresAt).toLocaleDateString('ru-RU');
+      statusText = `до ${expiryDate}`;
+    } else {
+      statusText = `${promo.activationsLeft}/${promo.activationsTotal}`;
+    }
+    
+    row.innerHTML = `
+      <span>${promo.code}</span>
+      <span>${promo.amount} 🤣</span>
+      <span>${promo.type === 'date' ? '📅' : '🔢'}</span>
+      <span>${statusText}</span>
+    `;
+    statsList.appendChild(row);
+  });
+}
+
+function showAddBalanceModal() {
+  if (me?.role !== "creator") return;
+  $("addBalanceModal").classList.remove("hidden");
+  $("addBalanceAmount").value = "";
+}
+
+function hideAddBalanceModal() {
+  $("addBalanceModal").classList.add("hidden");
+}
+
+async function addBalance() {
+  const amount = parseInt($("addBalanceAmount").value);
+  if (!amount || amount < 1) return;
+  
+  try {
+    await db.collection("users").doc(me.uid).update({
+      balance: firebase.firestore.FieldValue.increment(amount)
+    });
+    
+    me.balance += amount;
+    alert(`✅ Баланс пополнен на ${amount} LOL`);
+    hideAddBalanceModal();
+    updateBalanceScreen();
+  } catch (e) {
+    console.error("Ошибка пополнения:", e);
+    alert("Ошибка при пополнении");
+  }
+}
+
+/* =========================
+   Подарки в чате
+========================= */
+async function loadGiftItems() {
+  const giftType = $("giftType");
+  
+  // Очищаем все опции кроме первой (коины)
+  while (giftType.options.length > 1) {
+    giftType.remove(1);
+  }
+  
+  // Загружаем активные статусы из магазина
+  const itemsSnap = await db.collection("items").where("isActive", "==", true).get();
+  itemsSnap.forEach(doc => {
+    const item = doc.data();
+    const isExpired = item.limited && item.expiresAt && item.expiresAt < now();
+    if (!isExpired) {
+      const option = document.createElement("option");
+      option.value = doc.id;
+      const icon = item.iconType === 'image' ? '🖼️' : item.icon;
+      const name = item.name || 'Статус';
+      option.textContent = `${icon} ${name} (${item.price} 🤣)`;
+      giftType.appendChild(option);
+    }
+  });
+}
+
+function showGiftModal() {
+  if (!peer) return;
+  loadGiftItems();
+  $("giftModal").classList.remove("hidden");
+  $("giftCoinsInput").style.display = 'block';
+}
+
+function hideGiftModal() {
+  $("giftModal").classList.add("hidden");
+}
+
+async function confirmGift() {
+  const type = $("giftType").value;
+  const coins = type === 'coins' ? parseInt($("giftCoins").value) : 0;
+  
+  if (type === 'coins' && (!coins || coins < 1)) {
+    alert("Введите количество коинов");
+    return;
+  }
+  
+  let cost = 0;
+  let itemId = null;
+  
+  if (type === 'coins') {
+    cost = coins;
+  } else {
+    itemId = type;
+    const item = itemsCache.get(itemId);
+    if (!item) {
+      alert("Статус не найден");
+      return;
+    }
+    cost = item.price;
+  }
+  
+  // Проверка баланса дарителя
+  if (me.balance < cost) {
+    alert("❌ Недостаточно LOL коинов! У вас только " + me.balance);
+    return;
+  }
+  
+  // ПОЛУЧАЕМ АКТУАЛЬНЫЕ ДАННЫЕ ПОЛУЧАТЕЛЯ
+  const peerSnap = await db.collection("users").doc(peer.uid).get();
+  const freshPeer = peerSnap.data();
+  
+  // Проверка: есть ли у друга уже такой статус
+  if (itemId) {
+    if (itemId === 'star' && freshPeer.star) {
+      alert(`❌ У пользователя ${peer.nick} уже есть звезда!`);
+      return;
+    }
+    if (freshPeer.customItems && freshPeer.customItems.includes(itemId)) {
+      alert(`❌ У пользователя ${peer.nick} уже есть этот статус!`);
+      return;
+    }
+  }
+  
+  if (!confirm(`Подарить ${type === 'coins' ? coins + ' LOL' : 'статус'} за ${cost} 🤣?`)) return;
+  
+  try {
+    await db.runTransaction(async (transaction) => {
+      transaction.update(db.collection("users").doc(me.uid), {
+        balance: firebase.firestore.FieldValue.increment(-cost)
+      });
+      
+      if (type === 'coins') {
+        transaction.update(db.collection("users").doc(peer.uid), {
+          balance: firebase.firestore.FieldValue.increment(coins)
+        });
+      } else {
+        transaction.update(db.collection("users").doc(peer.uid), {
+          customItems: firebase.firestore.FieldValue.arrayUnion(itemId)
+        });
+      }
+      
+      const giftRef = db.collection("gifts").doc();
+      transaction.set(giftRef, {
+        from: me.uid,
+        to: peer.uid,
+        type: type === 'coins' ? 'coins' : 'item',
+        itemId: itemId,
+        amount: cost,
+        time: now()
+      });
+    });
+    
+    me.balance -= cost;
+    alert(`✅ Подарок отправлен!`);
+    hideGiftModal();
+  } catch (e) {
+    console.error("Ошибка при подарке:", e);
+    alert("Ошибка при отправке подарка");
+  }
+}
+
+function showCreatorGiftModal() {
+  if (!peer || me?.role !== "creator") return;
+  $("creatorGiftModal").classList.remove("hidden");
+  $("creatorGiftCoins").value = "";
+}
+
+function hideCreatorGiftModal() {
+  $("creatorGiftModal").classList.add("hidden");
+}
+
+async function confirmCreatorGift() {
+  const coins = parseInt($("creatorGiftCoins").value);
+  if (!coins || coins < 1) return;
+  
+  // Проверка баланса создателя
+  if (me.balance < coins) {
+    alert("❌ Недостаточно LOL коинов! У вас только " + me.balance);
+    return;
+  }
+  
+  if (!confirm(`Отправить ${coins} LOL пользователю ${peer.nick}?`)) return;
+  
+  try {
+    await db.runTransaction(async (transaction) => {
+      transaction.update(db.collection("users").doc(me.uid), {
+        balance: firebase.firestore.FieldValue.increment(-coins)
+      });
+      
+      transaction.update(db.collection("users").doc(peer.uid), {
+        balance: firebase.firestore.FieldValue.increment(coins)
+      });
+      
+      const giftRef = db.collection("gifts").doc();
+      transaction.set(giftRef, {
+        from: me.uid,
+        to: peer.uid,
+        type: 'coins',
+        amount: coins,
+        time: now(),
+        creatorGift: true
+      });
+    });
+    
+    me.balance -= coins;
+    alert(`✅ Отправлено ${coins} LOL`);
+    hideCreatorGiftModal();
+  } catch (e) {
+    console.error("Ошибка при отправке:", e);
+    alert("Ошибка при отправке");
+  }
+}
+
+/* =========================
+   Profile
+========================= */
+function renderProfile(){
+  if(!me) return;
+  $("meAvatar").src = me.avatar || defaultAvatar;
+  
+  // Формируем ник с выбранным статусом
+  let nickHtml = escapeHtml(me.nick || "Кто-то");
+  
+  // Показываем выбранный статус
+  if (me.selectedStatus === 'star' && me.star) {
+    nickHtml += ' <span style="font-size:18px;">⭐️</span>';
+  } else if (me.selectedStatus && me.customItems && me.customItems.includes(me.selectedStatus)) {
+    const item = itemsCache.get(me.selectedStatus);
+    if (item) {
+      if (item.iconType === 'image') {
+        nickHtml += ` <img src="${item.icon}" style="width:20px; height:20px; border-radius:4px; vertical-align:middle;">`;
+      } else {
+        nickHtml += ` <span style="font-size:18px;">${item.icon}</span>`;
+      }
+    }
+  }
+  
+  if (me.role === "creator") nickHtml += ' <span style="font-size:20px;">🔨</span>';
+  $("meNick").innerHTML = nickHtml;
+  
+  $("mePhone").textContent = me.phone || "";
+  $("meLogin").textContent = "Логин: " + (me.login || "");
+  $("balanceDisplay").textContent = me.balance || 0;
+
+  $("editAvatarPreview").src = me.avatar || defaultAvatar;
+  $("editNick").value = me.nick || "";
+  $("editPhone").value = me.phone || "";
+
+  const creatorBtn = $("creatorBtn");
+  if (me.role === "creator") {
+    creatorBtn.textContent = "🔨 Убрать создателя";
+    creatorBtn.classList.remove("hidden");
+  } else {
+    creatorBtn.textContent = "🔨 Стать создателем";
+    creatorBtn.classList.remove("hidden");
+  }
+  
+  // Показываем кнопку 🎁➕ только для создателя
+  if (me.role === "creator") {
+    $("creatorGiftBtn").style.display = "inline-block";
+  } else {
+    $("creatorGiftBtn").style.display = "none";
+  }
+}
+
+$("saveProfileBtn").addEventListener("click", async ()=>{
+  clearMsg($("profileMsg"));
+  const nick = $("editNick").value.trim() || "Кто-то";
+  const phone = $("editPhone").value.trim() || "";
+  
+  let avatar = $("editAvatarPreview").src;
+  const fileInput = $("editAvatarFile");
+  
+  if (fileInput.files && fileInput.files[0]) {
+    try {
+      avatar = await uploadAvatar(fileInput.files[0]);
+    } catch (e) {
+      console.error("Ошибка загрузки аватарки:", e);
+      alert("Ошибка при загрузке аватарки");
+      return;
+    }
+  }
+
+  try{
+    await db.collection("users").doc(me.uid).set({ 
+      nick, 
+      phone, 
+      avatar 
+    }, { merge:true });
+    
+    me.nick = nick; 
+    me.phone = phone; 
+    me.avatar = avatar;
+    usersCache.set(me.uid, me);
+    renderProfile();
+    setMsg($("profileMsg"), "Сохранено ✅", "ok");
+  }catch(e){
+    setMsg($("profileMsg"), "Ошибка: " + (e?.message || String(e)), "err");
+  }
+});
+
+/* =========================
+   Chats list realtime
+========================= */
+function bindChatListRealtime(){
+  if(!me) return;
+  if(unsubChatList){ unsubChatList(); unsubChatList=null; }
+
+  unsubChatList = db.collection("chats")
+    .where("participants", "array-contains", me.uid)
+    .onSnapshot(async (snap)=>{
+      await warmUsersCache();
+
+      let items=[];
+      snap.forEach(d=>{
+        const c=d.data();
+        if((c.lastTime||0) > 0){
+          items.push({ id:d.id, ...c });
+        }
+      });
+      items.sort((a,b)=>(b.lastTime||0)-(a.lastTime||0));
+
+      const box = $("chatList");
+      box.innerHTML = "";
+
+      if(items.length===0){
+        const div=document.createElement("div");
+        div.style.padding="10px 16px";
+        div.style.color="rgba(234,241,255,.55)";
+        div.style.fontWeight="1100";
+        div.textContent="Пока нет чатов. Нажми поиск и напиши кому-нибудь.";
+        box.appendChild(div);
+        return;
+      }
+
+      for(const c of items){
+        const peerId = (c.participants||[]).find(x=>x!==me.uid);
+        const u = usersCache.get(peerId) || { nick:"Кто-то", avatar: defaultAvatar, online:false, lastSeen:0 };
+
+        const row=document.createElement("div");
+        row.className="row";
+        
+        let nameHtml = escapeHtml(u.nick || "Кто-то");
+        
+        // Отображаем выбранный статус пользователя
+        if (u.selectedStatus === 'star' && u.star) {
+          nameHtml += ' <span style="font-size:16px;">⭐️</span>';
+        } else if (u.selectedStatus && u.customItems && u.customItems.includes(u.selectedStatus)) {
+          const item = itemsCache.get(u.selectedStatus);
+          if (item) {
+            if (item.iconType === 'image') {
+              nameHtml += ` <img src="${item.icon}" style="width:16px; height:16px; border-radius:4px; vertical-align:middle;">`;
+            } else {
+              nameHtml += ` <span style="font-size:16px;">${item.icon}</span>`;
+            }
+          }
+        }
+        
+        row.innerHTML = `
+          <img class="avatar" src="${escapeHtml(u.avatar || defaultAvatar)}" alt="">
+          <div class="meta">
+            <div class="nameLine">
+              <div class="name">${nameHtml}</div>
+              <div class="time">${c.lastTime ? fmtTime(c.lastTime) : ""}</div>
+            </div>
+            <div class="preview">
+              <div class="snippet">${escapeHtml(c.lastText || "")}</div>
+            </div>
+          </div>
+        `;
+        row.addEventListener("click", ()=> openChat(peerId));
+        box.appendChild(row);
+      }
+    }, (err)=>{
+      $("chatList").innerHTML = `<div class="err" style="margin:10px;">Ошибка чтения чатов: ${escapeHtml(err?.message || String(err))}</div>`;
+    });
+}
+
+/* =========================
+   Search screen
+========================= */
+$("openSearch").addEventListener("click", async ()=>{
+  await warmUsersCache();
+  $("searchInput").value = "";
+  $("searchResults").innerHTML = "";
+  $("searchEmpty").textContent = "Начни вводить никнейм…";
+  showScreen("scr-search");
+  $("searchInput").focus();
+});
+
+$("cancelSearch").addEventListener("click", ()=> showScreen("scr-chats"));
+
+$("clearSearch").addEventListener("click", ()=>{
+  $("searchInput").value = "";
+  $("searchResults").innerHTML = "";
+  $("searchEmpty").textContent = "Начни вводить никнейм…";
+  $("searchInput").focus();
+});
+
+$("searchInput").addEventListener("input", ()=>{
+  const q = $("searchInput").value.trim().toLowerCase();
+  const box = $("searchResults");
+  box.innerHTML = "";
+
+  if(!q){
+    $("searchEmpty").textContent = "Начни вводить никнейм…";
+    return;
+  }
+
+  let found=[];
+  for(const [uid,u] of usersCache.entries()){
+    if(!me) continue;
+    if(uid === me.uid) continue;
+    if((u.login||"") === (me.login||"")) continue;
+
+    const nick = (u.nick||"").toLowerCase();
+    if(nick.includes(q)) found.push(u);
+  }
+
+  found.sort((a,b)=>{
+    const ao = isOnline(a) ? 1 : 0;
+    const bo = isOnline(b) ? 1 : 0;
+    if(ao !== bo) return bo - ao;
+    return (a.nick||"").localeCompare(b.nick||"", "ru");
+  });
+
+  $("searchEmpty").textContent = found.length ? "" : "Никого не найдено";
+
+  for(const u of found.slice(0, 40)){
+    const row=document.createElement("div");
+    row.className="row";
+    
+    let nameHtml = escapeHtml(u.nick || "Кто-то");
+    if (u.selectedStatus === 'star' && u.star) {
+      nameHtml += ' <span style="font-size:16px;">⭐️</span>';
+    } else if (u.selectedStatus && u.customItems && u.customItems.includes(u.selectedStatus)) {
+      const item = itemsCache.get(u.selectedStatus);
+      if (item) {
+        if (item.iconType === 'image') {
+          nameHtml += ` <img src="${item.icon}" style="width:16px; height:16px; border-radius:4px; vertical-align:middle;">`;
+        } else {
+          nameHtml += ` <span style="font-size:16px;">${item.icon}</span>`;
+        }
+      }
+    }
+    
+    row.innerHTML = `
+      <img class="avatar" src="${escapeHtml(u.avatar || defaultAvatar)}" alt="">
+      <div class="meta">
+        <div class="nameLine" style="justify-content:flex-start; gap:10px;">
+          <div class="name" style="max-width:68%;">${nameHtml}</div>
+          <div class="statusDot ${isOnline(u) ? "on" : ""}" title="${isOnline(u) ? "онлайн" : "оффлайн"}"></div>
+        </div>
+        <div class="sub">${isOnline(u) ? "онлайн" : onlineText(u)}</div>
+      </div>
+    `;
+    row.addEventListener("click", ()=> openChat(u.uid));
+    box.appendChild(row);
+  }
+});
+
+/* =========================
+   Chat: open / close / messages
+========================= */
+function stopPeerWatch(){
+  if(unsubPeer){ unsubPeer(); unsubPeer=null; }
+}
+
+function stopMsgWatch(){
+  if(unsubMsgs){ unsubMsgs(); unsubMsgs=null; }
+}
+
+async function markAsRead(messageIds) {
+  if (!messageIds || messageIds.length === 0) return;
+  
+  const chatRef = db.collection("chats").doc(currentChatId);
+  const batch = db.batch();
+  
+  messageIds.forEach(id => {
+    const msgRef = chatRef.collection("messages").doc(id);
+    batch.update(msgRef, {
+      readBy: firebase.firestore.FieldValue.arrayUnion(me.uid)
+    });
+  });
+  
+  await batch.commit();
+}
+
+async function openChat(peerId){
+  // Загружаем статусы перед открытием чата
+  const itemsSnap = await db.collection("items").get();
+  itemsCache.clear();
+  itemsSnap.forEach(doc => itemsCache.set(doc.id, { id: doc.id, ...doc.data() }));
+  
+  await warmUsersCache();
+  const u = usersCache.get(peerId);
+  if(!u){ alert("Пользователь не найден"); return; }
+
+  peer = u;
+  currentChatId = chatIdFor(me.uid, peerId);
+
+  $("peerAvatar").src = peer.avatar || defaultAvatar;
+  
+  let nickHtml = escapeHtml(peer.nick || "Кто-то");
+  if (peer.selectedStatus === 'star' && peer.star) {
+    nickHtml += ' <span style="font-size:16px;">⭐️</span>';
+  } else if (peer.selectedStatus && peer.customItems && peer.customItems.includes(peer.selectedStatus)) {
+    const item = itemsCache.get(peer.selectedStatus);
+    if (item) {
+      if (item.iconType === 'image') {
+        nickHtml += ` <img src="${item.icon}" style="width:16px; height:16px; border-radius:4px; vertical-align:middle;">`;
+      } else {
+        nickHtml += ` <span style="font-size:16px;">${item.icon}</span>`;
+      }
+    }
+  }
+  $("peerNick").innerHTML = nickHtml;
+  
+  const actions = $("chatActions");
+  actions.innerHTML = "";
+
+  const blockBtn = document.createElement("div");
+  blockBtn.className = "action-btn";
+  blockBtn.innerHTML = "🚫";
+  blockBtn.title = "Заблокировать в этом чате";
+  blockBtn.onclick = toggleBlockInChat;
+  actions.appendChild(blockBtn);
+
+  if (me.role === "creator") {
+    const verifyBtn = document.createElement("div");
+    verifyBtn.className = "action-btn creator-action-btn";
+    verifyBtn.innerHTML = "✅";
+    verifyBtn.title = "Выдать/забрать синюю галочку";
+    verifyBtn.onclick = () => toggleVerify(peer.uid);
+    actions.appendChild(verifyBtn);
+
+    const muteBtn = document.createElement("div");
+    muteBtn.className = "action-btn creator-action-btn";
+    muteBtn.innerHTML = "🚫";
+    muteBtn.title = "Оглушить пользователя";
+    muteBtn.onclick = () => showMuteModal(peer.uid);
+    actions.appendChild(muteBtn);
+  }
+
+  await checkChatBlockStatus();
+  
+  stopPeerWatch();
+  unsubPeer = db.collection("users").doc(peerId).onSnapshot(async (snap)=>{
+    if(!snap.exists) return;
+    peer = { uid: snap.id, ...snap.data() };
+    usersCache.set(peer.uid, peer);
+
+    const typing = (peer.typingTo === me.uid) && ((now() - (peer.typingAt||0)) < 4000);
+    
+    const blockedByPeer = await checkChatBlockStatus();
+    
+    const isMuted = peer.mutedUntil && peer.mutedUntil > now();
+    
+    if (isMuted) {
+      const minutesLeft = Math.ceil((peer.mutedUntil - now()) / 60000);
+      $("peerStatus").textContent = `🔇 Заглушен (ещё ${minutesLeft} мин)`;
+    } else if (blockedByPeer) {
+      $("peerStatus").textContent = "Заблокирован этим человеком";
+    } else if (typing) {
+      $("peerStatus").textContent = "Печатает…";
+    } else {
+      $("peerStatus").textContent = onlineText(peer);
+    }
+
+    let nickHtml = escapeHtml(peer.nick || "Кто-то");
+    if (peer.selectedStatus === 'star' && peer.star) {
+      nickHtml += ' <span style="font-size:16px;">⭐️</span>';
+    } else if (peer.selectedStatus && peer.customItems && peer.customItems.includes(peer.selectedStatus)) {
+      const item = itemsCache.get(peer.selectedStatus);
+      if (item) {
+        if (item.iconType === 'image') {
+          nickHtml += ` <img src="${item.icon}" style="width:16px; height:16px; border-radius:4px; vertical-align:middle;">`;
+        } else {
+          nickHtml += ` <span style="font-size:16px;">${item.icon}</span>`;
+        }
+      }
+    }
+    $("peerNick").innerHTML = nickHtml;
+  });
+
+  const chatRef = db.collection("chats").doc(currentChatId);
+  const chatSnap = await chatRef.get();
+  if(!chatSnap.exists){
+    await chatRef.set({
+      participants:[me.uid, peerId],
+      lastText:"",
+      lastTime:0
+    });
+  }
+
+  stopMsgWatch();
+  let unreadMessageIds = [];
+  
+  unsubMsgs = chatRef.collection("messages").orderBy("time").onSnapshot((ss)=>{
+    const box = $("msgList");
+    box.innerHTML = "";
+    unreadMessageIds = [];
+
+    ss.forEach(doc => {
+      const m = doc.data();
+      const b = document.createElement("div");
+      b.className = "bubble" + (m.sender === me.uid ? " me" : "");
+      
+      const textDiv = document.createElement("div");
+      textDiv.textContent = m.text || "";
+      b.appendChild(textDiv);
+
+      const footerDiv = document.createElement("div");
+      footerDiv.className = "message-footer";
+      
+      const timeSpan = document.createElement("span");
+      timeSpan.className = "t";
+      timeSpan.textContent = m.time ? fmtTime(m.time) : "";
+      footerDiv.appendChild(timeSpan);
+
+      if (m.sender === me.uid) {
+        const statusSpan = document.createElement("span");
+        statusSpan.className = "message-status";
+        
+        const isRead = m.readBy && m.readBy.includes(peer.uid);
+        
+        if (isRead) {
+          statusSpan.innerHTML = '✔✔';
+          statusSpan.classList.add("status-read");
+        } else {
+          statusSpan.innerHTML = '✔';
+          statusSpan.classList.add("status-delivered");
+        }
+        
+        footerDiv.appendChild(statusSpan);
+      } else {
+        if (!m.readBy || !m.readBy.includes(me.uid)) {
+          unreadMessageIds.push(doc.id);
+        }
+      }
+
+      b.appendChild(footerDiv);
+      box.appendChild(b);
+    });
+
+    if (unreadMessageIds.length > 0) {
+      markAsRead(unreadMessageIds);
+    }
+
+    box.scrollTop = box.scrollHeight;
+  });
+
+  $("msgInput").value = "";
+  await clearMyTyping();
+  updateChatUI();
+
+  showScreen("scr-chat");
+  $("msgInput").focus();
+}
+
+function closeChat(){
+  clearMyTyping();
+  showScreen("scr-chats");
+}
+
+$("backToChats").addEventListener("click", closeChat);
+$("exitChat").addEventListener("click", closeChat);
+
+function updateChatUI() {
+  const sendBtn = $("sendBtn");
+  const msgInput = $("msgInput");
+  
+  if (isBlocked) {
+    sendBtn.disabled = true;
+    msgInput.disabled = true;
+    msgInput.placeholder = "Вы заблокированы в этом чате";
+  } else {
+    sendBtn.disabled = false;
+    msgInput.disabled = false;
+    msgInput.placeholder = "Сообщение";
+  }
+}
+
+async function sendMessage(){
+  if (isBlocked) {
+    alert("Вы не можете отправлять сообщения в этом чате");
+    return;
+  }
+  
+  const isMuted = await checkMuteStatus(me.uid);
+  if (isMuted) {
+    alert("Вы временно заглушены и не можете отправлять сообщения");
+    return;
+  }
+  
+  const text = $("msgInput").value.trim();
+  if(!text || !currentChatId || !peer) return;
+
+  $("msgInput").value = "";
+  const chatRef = db.collection("chats").doc(currentChatId);
+
+  const msgData = {
+    text,
+    sender: me.uid,
+    time: now(),
+    readBy: [me.uid]
+  };
+
+  await chatRef.collection("messages").add(msgData);
+
+  await chatRef.set({
+    participants: [me.uid, peer.uid],
+    lastText: text,
+    lastTime: now()
+  }, { merge:true });
+
+  await clearMyTyping();
+}
+
+$("sendBtn").addEventListener("click", sendMessage);
+$("msgInput").addEventListener("keydown", (e)=>{
+  if(e.key === "Enter") sendMessage();
+});
+
+/* =========================
+   Typing
+========================= */
+async function setMyTyping(){
+  if(!peer || !session || isBlocked) return;
+  const isMuted = await checkMuteStatus(me.uid);
+  if (isMuted) return;
+  
+  try{
+    await db.collection("users").doc(me.uid).set({
+      typingTo: peer.uid,
+      typingAt: now()
+    }, { merge:true });
+  }catch{}
+}
+
+async function clearMyTyping(){
+  if(!session || !me) return;
+  try{
+    await db.collection("users").doc(me.uid).set({
+      typingTo: "",
+      typingAt: 0
+    }, { merge:true });
+  }catch{}
+}
+
+$("msgInput").addEventListener("input", ()=>{
+  if(!peer || isBlocked) return;
+
+  if(!typingTimer){
+    typingTimer = setTimeout(async ()=>{
+      typingTimer = null;
+      await setMyTyping();
+    }, 150);
+  }
+
+  if(typingClearTimer) clearTimeout(typingClearTimer);
+  typingClearTimer = setTimeout(()=> clearMyTyping(), 1200);
+});
+
+/* =========================
+   Boot
+========================= */
+(async ()=>{
+  $("composer").style.display = "none";
+
+  const s = loadSession();
+  if(s && s.uid){
+    session = s;
+    try{
+      await afterLogin();
+    }catch(e){
+      await logout();
+      setAuthMode("login");
+      setMsg($("authMsg"), "Сессия устарела. Войди заново.", "err");
+    }
+  }else{
+    setAuthMode("login");
+  }
+
+  $("muteModal").addEventListener("click", (e) => {
+    if (e.target === $("muteModal")) hideMuteModal();
+  });
+  
+  $("giftModal").addEventListener("click", (e) => {
+    if (e.target === $("giftModal")) hideGiftModal();
+  });
+  
+  $("creatorGiftModal").addEventListener("click", (e) => {
+    if (e.target === $("creatorGiftModal")) hideCreatorGiftModal();
+  });
+  
+  $("createPromoModal").addEventListener("click", (e) => {
+    if (e.target === $("createPromoModal")) hideCreatePromoModal();
+  });
+  
+  $("addItemModal").addEventListener("click", (e) => {
+    if (e.target === $("addItemModal")) hideAddItemModal();
+  });
+  
+  $("editItemModal").addEventListener("click", (e) => {
+    if (e.target === $("editItemModal")) hideEditItemModal();
+  });
+  
+  $("addBalanceModal").addEventListener("click", (e) => {
+    if (e.target === $("addBalanceModal")) hideAddBalanceModal();
+  });
+})();
+</script>
+</body>
+</html>
